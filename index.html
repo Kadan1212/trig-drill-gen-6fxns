@@ -285,22 +285,16 @@
     </div>
     <div class="problems" id="problems"></div>
     <div class="solutions" id="solutions">
-      <!--<div class="solution" data-key="3, 4" data-answer="null"><span class="small">undefined</span></div>-->
-      <div class="solution" data-key="q" data-answer="1/2"><span class="frac"><span class="numer">1</span><span class="denom">2</span></span></div>
-      <div class="solution" data-key="w" data-answer="rt2/2"><span class="frac"><span class="numer"><span class="sqrt">2</span></span><span class="denom">2</span></span></div>
-      <div class="solution" data-key="e" data-answer="rt3/2"><span class="frac"><span class="numer"><span class="sqrt">3</span></span><span class="denom">2</span></span></div>
-      <div class="solution" data-key="r" data-answer="1"><span>1</span></div>
-      <div class="solution" data-key="a" data-answer="-1/2"><span>-<span class="frac"><span class="numer">1</span><span class="denom">2</span></span></span></div>
-      <div class="solution" data-key="s" data-answer="-rt2/2"><span>-<span class="frac"><span class="numer"><span class="sqrt">2</span></span><span class="denom">2</span></span></span></div>
-      <div class="solution" data-key="d" data-answer="-rt3/2"><span>-<span class="frac"><span class="numer"><span class="sqrt">3</span></span><span class="denom">2</span></span></span></div>
-      <div class="solution" data-key="f" data-answer="-1"><span>-1</span></div>
-      <div class="solution" data-key="space" data-answer="0"><span>0</span></div>
-
-      <div class="solution" data-key="z" data-answer="null"><span class="small">undefined</span></div>
-      <div class="solution" data-key="x" data-answer="2rt3/3"><span>2√3/3</span></div>
-      <div class="solution" data-key="c" data-answer="2"><span>2</span></div>
-      <div class="solution" data-key="v" data-answer="rt3/3"><span>√3/3</span></div>
-      <div class="solution" data-key="b" data-answer="rt3"><span>√3</span></div>
+  <div class="solution" data-key="q" data-answer="1/2"><span class="frac"><span class="numer">1</span><span class="denom">2</span></span></div>
+  <div class="solution" data-key="w" data-answer="rt2/2"><span class="frac"><span class="numer"><span class="sqrt">2</span></span><span class="denom">2</span></span></div>
+  <div class="solution" data-key="e" data-answer="rt3/2"><span class="frac"><span class="numer"><span class="sqrt">3</span></span><span class="denom">2</span></span></div>
+  <div class="solution" data-key="r" data-answer="1"><span>1</span></div>
+  <div class="solution" data-key="space" data-answer="0"><span>0</span></div>
+  <div class="solution" data-key="z" data-answer="null"><span class="small">undefined</span></div>
+  <div class="solution" data-key="x" data-answer="2rt3/3"><span>2√3/3</span></div>
+  <div class="solution" data-key="c" data-answer="2"><span>2</span></div>
+  <div class="solution" data-key="v" data-answer="rt3/3"><span>√3/3</span></div>
+  <div class="solution" data-key="b" data-answer="rt3"><span>√3</span></div>
     </div>
     <div class="clock" id="clock">3:00</div>
     <script>
@@ -560,6 +554,18 @@ Array.from(solutions.children).forEach(solution => {
 solutions.addEventListener('click', e => {
   const solution = e.target.closest('.solution');
   if (solution) submitAnswer(solution.dataset.answer);
+});
+      // Right-click to submit the negative of a solution
+solutions.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  const solution = e.target.closest('.solution');
+  if (solution) {
+    let answer = solution.dataset.answer;
+    if (answer && answer !== '0' && answer !== '1' && answer !== 'null') {
+      answer = answer.startsWith('-') ? answer.slice(1) : '-' + answer;
+    }
+    submitAnswer(answer);
+  }
 });
 function submitAnswer(answer) {
   if (!playing) return;
