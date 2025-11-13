@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
+//<!DOCTYPE html>
+//<html lang="en">
   <head>
     <title>Trig Drill Generator</title>
     <meta charset="UTF-8">
@@ -586,4 +586,4 @@ document.getElementById('menu').addEventListener('click', e => {
 });
     </script>
   </body>
-</html>
+//</html>
