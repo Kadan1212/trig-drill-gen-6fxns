@@ -207,6 +207,13 @@ function getAnswers(deg) {
     if (typeof t[1] === 'string') t[1] = '-' + t[1]; else t[1] *= -1;
     return t;
   }
+  if (deg > 180 && deg < 270) {
+  const t = answers[deg - 180].slice();
+  if (typeof t[0] === 'string') t[0] = '-' + t[0]; else t[0] *= -1; // sin
+  if (typeof t[1] === 'string') t[1] = '-' + t[1]; else t[1] *= -1; // cos
+  if (typeof t[2] === 'string') t[2] = '' + t[2]; // tan stays positive
+  return t;
+}
   // Q4
   if (deg > 270 && deg < 360) {
     const t = answers[360 - deg].slice();
@@ -391,8 +398,13 @@ function submitAnswer(rawAnswer) {
   if (answer === 'null') answer = null;
   else if (answer === '0' || answer === '1' || answer === '-1') answer = +answer;
   // match exact string for string answers
-  const correct = problems[current].answer;
-  const matched = (answer === correct) || (String(answer) === String(correct));
+  function normalizeAnswer(ans) {
+  if (ans === null) return 'null';
+  return ('' + ans).replace(/rt/g,'√').replace(/\s/g,'').replace(/^\+/, '');
+}
+
+const correct = problems[current].answer;
+const matched = normalizeAnswer(answer) === normalizeAnswer(correct);
   const problemEl = problemsWrapper.children[current];
   if (matched) {
     problemEl.classList.add('correct');
