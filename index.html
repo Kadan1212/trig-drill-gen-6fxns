@@ -1,72 +1,67 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Trig Drill Generator</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="description" content="A drill quiz generator for my trigonometry class.">
-  <meta property="og:image" content="https://sheeptester.github.io/img/drills-smaller.png">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
   <style>
     /* FRACTIONS & SQUARE ROOTS */
-    .frac { display: inline-block; vertical-align: middle; text-align: center; font-size: 0.5em; margin: 0 0.1em; }
-    .numer { display: table; border-bottom: 0.03em solid currentColor; vertical-align: middle; }
-    .sqrt { margin: 0 0.1em; position: relative; }
-    .sqrt::before { content: '√'; }
-    .sqrt::after { content: ''; display: block; position: absolute; top: 0.25em; left: 0.9ch; right: 0; border-top: 0.03em solid currentColor; height: 1px; }
+    .frac { display:inline-block; vertical-align:middle; text-align:center; font-size:0.5em; margin:0 0.1em; }
+    .numer { display:table; border-bottom:0.03em solid currentColor; vertical-align:middle; }
+    .sqrt { margin:0 0.1em; position:relative; }
+    .sqrt::before { content:'√'; }
+    .sqrt::after { content:''; display:block; position:absolute; top:0.25em; left:0.9ch; right:0; border-top:0.03em solid currentColor; height:1px; }
 
-    html, body { width: 100%; height: 100%; margin: 0; font-family: 'Open Sans', sans-serif; font-size: 0; color: #333; background-color: #fbfbfb; overflow: hidden; --problem-n: 0; display: flex; justify-content: center; align-items: center; }
-    
-    .intro-modal { box-shadow: 0 3px 20px rgba(0,0,0,0.5); border-radius: 30px; padding: 30px; display: none; }
-    .show-intro-modal .intro-modal { display: flex; flex-direction: column; }
-    h1 { margin:0 0 20px 0; font-weight: normal; font-size: 36px; }
-    h2 { margin:0 0 20px 0; font-weight: normal; font-size: 16px; color:#666; }
-
-    #start, #menu { background-color: #2092e3; border-radius: 10px; padding: 10px; border: none; color:white; width:100%; font-size:20px; cursor:pointer; margin-top:10px; }
-
-    .options p { margin: 10px 0; font-size:16px; }
+    html,body { height:100%; width:100%; margin:0; font-family:"Open Sans",sans-serif; color:#333; background:#fbfbfb; --problem-n:0; font-size:0; overflow:hidden; display:flex; justify-content:center; align-items:center; }
+    /* container visibility states */
+    body.show-intro-modal .intro-modal { display:flex; }
+    body.show-intro-modal .solutions { display:none; }
+    body.show-intro-modal .problems { display:none; }
+    body.show-score .intro-modal.not-score { display:none; }
+    /* modal */
+    .intro-modal { box-shadow:0 3px 20px rgba(0,0,0,0.45); border-radius:20px; padding:28px; display:none; flex-direction:column; width:380px; box-sizing:border-box; background:white; }
+    h1 { margin:0 0 12px 0; font-weight:normal; font-size:28px; }
+    h2 { margin:0 0 12px 0; font-weight:normal; color:#666; font-size:14px; }
+    #start,#menu { background:#2092e3; color:white; border:none; padding:10px; border-radius:10px; font-size:16px; cursor:pointer; width:100%; margin-top:10px; }
+    .options { max-height:40vh; overflow:auto; margin-top:6px; }
+    .options p { margin:8px 0; font-size:14px; }
     .options label, .options input[type=checkbox] { cursor:pointer; }
 
-    .problems { padding-top: 40vh; margin-top: calc(var(--problem-n) * -20vh); transition: margin-top .2s; }
-    .problem { font-size: 14vh; font-family: serif; padding: 3vh 3vw; width:50vw; min-width:50vh; height:20vh; border-right:3px solid rgba(0,0,0,0.1); box-sizing:border-box; text-align:right; opacity:0.5; position:relative; transition: opacity .2s, color .2s; }
-    .answer { align-items:center; position:absolute; font-size:0.5em; opacity:0; left:10px; top:0; bottom:0; display:flex; transition:all .2s; }
-    .current { opacity:1; }
-    .show-wrong .wrong { color:#d12525; }
-    .show-correct .wrong .answer { opacity:1; }
-    .show-wrong .correct { color:#0a530a; }
+    /* problems area */
+    .problems { padding-top:40vh; margin-top:calc(var(--problem-n) * -20vh); transition:margin-top .2s; width:50vw; box-sizing:border-box; }
+    .problem { font-size:14vh; font-family:serif; padding:3vh 3vw; width:50vw; min-width:50vh; height:20vh; border-right:3px solid rgba(0,0,0,0.08); box-sizing:border-box; text-align:right; opacity:0.5; position:relative; transition:opacity .15s, color .15s, background .15s; }
+    .problem.current { opacity:1; color:#000; background:transparent; }
+    .answer { position:absolute; left:10px; top:0; bottom:0; display:flex; align-items:center; opacity:0; font-size:0.5em; transition:opacity .15s; }
+    .problem.correct { color:#0a530a; }
+    .problem.wrong { color:#d12525; }
+    .problem.correct .answer, .problem.wrong .answer { opacity:1; }
 
-    .solutions { width: 50vw; position: fixed; top: 0; right: 0; height: 100%; display: grid; grid-gap: 20px; grid-template-rows: repeat(3, 1fr); grid-template-columns: repeat(4, 1fr); padding: 20px; box-sizing: border-box; }
-    .solution { padding: 10px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.3); background-color:white; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:10vh; position:relative; transition: box-shadow .2s; }
-    .solution:hover { box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-    .solution.big { grid-column: 1 / -1; font-size:14vh; } /* Big undefined button */
-    .solution::after { position:absolute; top:0; left:0; color:rgba(0,0,0,0.3); font-size:2vh; content: attr(data-key); margin:5px; }
+    /* solutions grid: 3 columns x 4 rows */
+    .solutions { width:46vw; position:fixed; right:0; top:0; height:100%; display:grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; gap:16px; padding:24px; box-sizing:border-box; align-content:center; justify-items:stretch; }
+    .solution { background:white; border-radius:12px; box-shadow:0 3px 10px rgba(0,0,0,0.18); display:flex; align-items:center; justify-content:center; cursor:pointer; user-select:none; font-size:6vh; position:relative; padding:6px; text-align:center; }
+    .solution.big { font-size:6.5vh; grid-column:auto; } /* kept consistent size for 3x4 */
+    .solution::after { position:absolute; top:6px; left:6px; color:rgba(0,0,0,0.25); font-size:12px; content:attr(data-key); }
+    .solution:active { transform:translateY(1px); }
+    /* hide clock until requested */
+    .clock { position:fixed; top:6px; left:0; width:100%; text-align:center; font-size:18px; color:rgba(0,0,0,0.5); display:none; }
+    body.show-time .clock { display:block; }
 
-    .clock { position:fixed; top:5px; left:0; width:100%; text-align:center; font-size:20px; color:rgba(0,0,0,0.5); display:none; }
-    .show-time .clock { display:block; }
+    /* score modal */
+    .intro-modal.score { display:none; width:500px; }
+    body.show-score .intro-modal.score { display:flex; }
+    body.show-score .intro-modal.not-score { display:none; }
 
-    .score { font-size:24px; width:500px; margin-bottom:10px; max-width:70vw; }
-    .options { max-height:50vh; overflow:auto; }
-
-    @media (max-aspect-ratio: 11/6) {
-      .solutions { width:100%; bottom:0; top:auto; height:50vh; background-image: linear-gradient(0deg, rgba(255,255,255,0.8), transparent); }
-      .solution { font-size:5vh; }
-      .problems { padding-top:20vh; }
-      .problem { border-right:none; text-align:center; min-width:100%; }
+    @media (max-width: 900px) {
+      .intro-modal { width:320px; }
+      .solutions { position:fixed; bottom:0; top:auto; width:100%; height:50vh; grid-template-columns: repeat(3,1fr); padding:14px; gap:10px; }
+      .problems, .problem { width:100vw; min-width:0; }
     }
-    body.show-intro-modal .solutions {
-  display: none;
-}
-    .sqrt {
-  display: inline-block;
-  text-decoration: overline;
-  font-size: 0.9em;
-  padding-left: 2px;
-}
   </style>
 </head>
 <body class="show-intro-modal">
 
-  <!-- INTRO MODAL -->
+  <!-- intro (options) -->
   <div class="intro-modal not-score">
     <h1>Trig Drill Generator</h1>
     <h2>Options</h2>
@@ -80,11 +75,13 @@
       <p><input type="checkbox" id="csc" checked> <label for="csc">Include csc problems?</label></p>
 
       <p><input type="checkbox" id="deg90s" checked> <label for="deg90s">Include 90°-type angles?</label></p>
-      <p><input type="checkbox" id="deg30s" checked> <label for="deg30s">Include 30°- and 60°-type angles?</label></p>
-      <p><input type="checkbox" id="deg45s" checked> <label for="deg45s">Include 45°-type angles?</label></p>
+      <p><input type="checkbox" id="deg30s" checked> <label for="deg30s">Include 30° & 60° angles?</label></p>
+      <p><input type="checkbox" id="deg45s" checked> <label for="deg45s">Include 45° angles?</label></p>
       <p><input type="checkbox" id="include360" checked> <label for="include360">Include 360°?</label></p>
+
       <p><input type="checkbox" id="coterminal" checked> <label for="coterminal">Include coterminal angles?</label></p>
       <p><input type="checkbox" id="quadionly"> <label for="quadionly">Limit to quadrant I angles?</label></p>
+
       <p><input type="checkbox" id="showcorrectness" checked> <label for="showcorrectness">Show wrong answers?</label></p>
       <p><input type="checkbox" id="showcorrect" checked> <label for="showcorrect">Show correct answers?</label></p>
       <p><input type="checkbox" id="showtime" checked> <label for="showtime">Show time?</label></p>
@@ -93,199 +90,171 @@
     <button id="start">Start</button>
   </div>
 
+  <!-- score modal (only shown at end) -->
   <div class="intro-modal score">
-    <div id="score"></div>
+    <div id="score" class="score"></div>
     <button id="menu">Menu</button>
   </div>
 
-  <div class="problems" id="problems"></div>
+  <!-- problems column (center) -->
+  <div class="problems" id="problems" aria-live="polite"></div>
 
-  <div class="solutions" id="solutions">
-  <!-- Row 1 -->
-  <div class="solution" data-key="q" data-answer="1/2"><span>1/2</span></div>
-  <div class="solution" data-key="w" data-answer="rt2/2"><span>√2/2</span></div>
-  <div class="solution" data-key="e" data-answer="rt3/2"><span>√3/2</span></div>
+  <!-- solutions (3 x 4 grid) -->
+  <div class="solutions" id="solutions" aria-hidden="true">
+    <!-- Row 1 -->
+    <div class="solution" data-key="Q" data-answer="1/2"><span class="frac"><span class="numer">1</span><span class="denom">2</span></span></div>
+    <div class="solution" data-key="W" data-answer="rt2/2"><span class="frac"><span class="numer"><span class="sqrt">2</span></span><span class="denom">2</span></span></div>
+    <div class="solution" data-key="E" data-answer="rt3/2"><span class="frac"><span class="numer"><span class="sqrt">3</span></span><span class="denom">2</span></span></div>
 
-  <!-- Row 2 -->
-  <div class="solution" data-key="r" data-answer="1"><span>1</span></div>
-  <div class="solution" data-key="t" data-answer="0"><span>0</span></div>
-  <div class="solution big" data-key="y" data-answer="null"><span>undefined</span></div>
+    <!-- Row 2 -->
+    <div class="solution" data-key="R" data-answer="1"><span>1</span></div>
+    <div class="solution" data-key="T" data-answer="0"><span>0</span></div>
+    <div class="solution" data-key="Y" data-answer="null"><span style="font-size:4vh;">undefined</span></div>
 
-  <!-- Row 3 -->
-  <div class="solution" data-key="u" data-answer="rt3/3"><span>√3/3</span></div>
-  <div class="solution" data-key="i" data-answer="rt3"><span>√3</span></div>
-  <div class="solution" data-key="o" data-answer="rt2"><span>√2</span></div>
+    <!-- Row 3 -->
+    <div class="solution" data-key="U" data-answer="rt3/3"><span>√3/3</span></div>
+    <div class="solution" data-key="I" data-answer="rt3"><span>√3</span></div>
+    <div class="solution" data-key="O" data-answer="rt2"><span>√2</span></div>
 
-  <!-- Row 4 -->
-  <div class="solution" data-key="p" data-answer="2"><span>2</span></div>
-  <div class="solution" data-key="a" data-answer="1/3"><span>1/3</span></div>
-  <div class="solution" data-key="s" data-answer="3/2"><span>3/2</span></div>
-  <div class="solution" data-key="d" data-answer="2rt3/3"><span>2√3/3</span></div>
-</div>
+    <!-- Row 4 -->
+    <div class="solution" data-key="P" data-answer="2"><span>2</span></div>
+    <div class="solution" data-key="A" data-answer="1/3"><span>1/3</span></div>
+    <div class="solution" data-key="S" data-answer="2rt3/3"><span>2√3/3</span></div>
+  </div>
 
-  <div class="clock" id="clock">3:00</div>
-    <script>
-      function renderRT(str) {
-  // Replace rtX with √X
-  return str.replace(/rt(\d+)/g, `<span class="sqrt">$1</span>`);
-}
-function generateDrill({
-  useDegrees = true,
-  radians = false,
-  cot: includeCot = true,
-  sec: includeSec = true,
-  csc: includeCsc = true,
-  tan: includeTan = true,
-  deg90s = true,
-  deg30s = true,
-  deg45s = true,
-  include360 = true,
-  coterminal = true,
-  quadIOnly = false
-} = {}) {
+  <div class="clock" id="clock">00:00.000</div>
 
+<script>
+/* ---------- core drill generator (cleaned up) ---------- */
+
+/* Helper: invert many of our string representations into their reciprocals.
+   Supports the specific strings we use in the app (rt2/2, rt3/2, rt3/3, rt2, rt3, 1/2, etc.)
+*/
 function invert(value) {
   if (value === 0) return null;
-  if (value === null) return 0; // sec(90°) etc.
+  if (value === null) return 0;
   if (typeof value === 'number') return 1 / value;
-  // handle strings like '-rt3/2'
-  const neg = value.startsWith('-');
-  const val = neg ? value.slice(1) : value;
-  let result;
-  if (val === '1/2') result = 2;
-  else if (val === 'rt2/2') result = 'rt2';
-  else if (val === 'rt3/2') result = '2/rt3';
-  else if (val === 'rt3/3') result = 'rt3';
-  else if (val === 'rt3') result = 'rt3/3';
-  else if (val === '2/rt3') result = 'rt3/2';
-  else if (val === 'rt2') result = 'rt2/2';
-  else result = 1 / parseFloat(val);
-  return neg ? '-' + result : result;
+  const neg = (''+value).startsWith('-');
+  const v = neg ? value.slice(1) : value;
+
+  // map common rational/surd forms -> reciprocal form
+  const map = {
+    '1/2': '2',
+    'rt2/2': 'rt2',
+    'rt3/2': '2/rt3',
+    'rt3/3': 'rt3',
+    'rt2': 'rt2/2',
+    'rt3': 'rt3/3',
+    '2': '1/2',
+    '1/3': '3',
+    '3/2': '2/3',
+    '2rt3/3': '3/(2rt3)'  // unlikely used but present for completeness
+  };
+  const res = map[v] || (1 / parseFloat(v));
+  return neg ? '-' + res : res;
 }
 
-  const answers = {
-    0: [0, 1, 0],
-    30: ['1/2', 'rt3/2', 'rt3/3'],
-    45: ['rt2/2', 'rt2/2', 1],
-    60: ['rt3/2', '1/2', 'rt3'],
-    90: [1, 0, null]
-  };
-  function getAnswers(degrees) {
-    degrees = (degrees % 360 + 360) % 360;
-    if (answers[degrees]) return answers[degrees].slice(); // QUADRANT I
-    if (degrees === 180) {
-      const t = answers[0].slice();
-      t[1] = -1;
-      return t;
-    }
-    if (degrees === 270) {
-      const t = answers[90].slice();
-      t[0] = -1;
-      return t;
-    }
-    // QUADRANT II
-    if (degrees > 90 && degrees < 180) {
-      const t = answers[180 - degrees].slice();
-      if (typeof t[1] === 'string') t[1] = '-' +t[1];
-      else if (typeof t[1] === 'number') t[1] *= -1;
-      if (typeof t[2] === 'string') t[2] = '-' +t[2];
-      else if (typeof t[2] === 'number') t[2] *= -1;
-      return t;
-    }
-    // QUADRANT III
-    if (degrees > 180 && degrees < 270) {
-      const t = answers[degrees - 180].slice();
-      if (typeof t[0] === 'string') t[0] = '-' +t[0];
-      else if (typeof t[0] === 'number') t[0] *= -1;
-      if (typeof t[1] === 'string') t[1] = '-' +t[1];
-      else if (typeof t[1] === 'number') t[1] *= -1;
-      return t;
-    }
-    // QUADRANT IV
-    if (degrees > 270 && degrees < 360) {
-      const t = answers[360 - degrees].slice();
-      if (typeof t[0] === 'string') t[0] = '-' +t[0];
-      else if (typeof t[0] === 'number') t[0] *= -1;
-      if (typeof t[2] === 'string') t[2] = '-' +t[2];
-      else if (typeof t[2] === 'number') t[2] *= -1;
-      return t;
-    }
-    throw new Error('wut: ' + degrees);
+/* The answers table for sin, cos, tan at canonical angles (Q1).
+   getAnswers returns [sin, cos, tan] (string/number/null).
+*/
+const answers = {
+  0: [0, 1, 0],
+  30: ['1/2', 'rt3/2', 'rt3/3'],
+  45: ['rt2/2', 'rt2/2', 1],
+  60: ['rt3/2', '1/2', 'rt3'],
+  90: [1, 0, null]
+};
+function getAnswers(deg) {
+  deg = ((deg % 360) + 360) % 360;
+  if (answers[deg]) return answers[deg].slice();
+  if (deg === 180) { const t = answers[0].slice(); t[1] = -1; return t; }
+  if (deg === 270) { const t = answers[90].slice(); t[0] = -1; return t; }
+  // Q2
+  if (deg > 90 && deg < 180) {
+    const t = answers[180 - deg].slice();
+    if (typeof t[1] === 'string') t[1] = '-' + t[1]; else t[1] *= -1;
+    if (typeof t[2] === 'string') t[2] = '-' + t[2]; else t[2] *= -1;
+    return t;
   }
+  // Q3
+  if (deg > 180 && deg < 270) {
+    const t = answers[deg - 180].slice();
+    if (typeof t[0] === 'string') t[0] = '-' + t[0]; else t[0] *= -1;
+    if (typeof t[1] === 'string') t[1] = '-' + t[1]; else t[1] *= -1;
+    return t;
+  }
+  // Q4
+  if (deg > 270 && deg < 360) {
+    const t = answers[360 - deg].slice();
+    if (typeof t[0] === 'string') t[0] = '-' + t[0]; else t[0] *= -1;
+    if (typeof t[2] === 'string') t[2] = '-' + t[2]; else t[2] *= -1;
+    return t;
+  }
+  throw new Error('angle not supported: ' + deg);
+}
+
+/* Build problems based on options: returns array of {fn,arg,type,answer} */
+function generateDrill(opts = {}) {
+  const {
+    useDegrees = true, radians = false,
+    includeTan = false, includeCot = false, includeSec = false, includeCsc = false,
+    deg90s = true, deg30s = true, deg45s = true, include360 = true, coterminal = false,
+    quadIOnly = false
+  } = opts;
+
   const problems = [];
-  const radiansMap = {
-     0: [0, 1],  30: [1, 6],  45: [1, 4],  60: [1, 3],
-    90: [1, 2], 120: [2, 3], 135: [3, 4], 150: [5, 6]
-  };
-  function toRadians(degrees) {
-    if (degrees === 0) return 0;
-    const base = (degrees % 180 + 180) % 180;
-    const diff = (degrees - base) / 180;
-    let [numer, denom] = radiansMap[base];
-    numer += denom * diff;
-    return [numer, denom];
-  }
-  function angle(degrees, getCoterminals = true) {
-    const [sin, cos, tan] = getAnswers(degrees);
-    if (getCoterminals && coterminal) {
-      if (degrees !== 360) angle(degrees - 360, false);
-      angle(degrees + 360, false);
+  function addAngle(deg, includeCoterminals = true) {
+    const [sin, cos, tan] = getAnswers(deg);
+    if (includeCoterminals && coterminal) {
+      if (deg !== 360) addAngle(deg - 360, false);
+      addAngle(deg + 360, false);
     }
     if (useDegrees) {
-  problems.push({fn: 'sin', arg: degrees, type: 'degrees', answer: sin});
-  problems.push({fn: 'cos', arg: degrees, type: 'degrees', answer: cos});
-  if (includeTan) problems.push({fn: 'tan', arg: degrees, type: 'degrees', answer: tan});
-  if (includeCot) problems.push({fn: 'cot', arg: degrees, type: 'degrees', answer: invert(tan)});
-  if (includeSec) problems.push({fn: 'sec', arg: degrees, type: 'degrees', answer: invert(cos)});
-  if (includeCsc) problems.push({fn: 'csc', arg: degrees, type: 'degrees', answer: invert(sin)});
-}
-if (radians) {
-  problems.push({fn: 'sin', arg: toRadians(degrees), type: 'radians', answer: sin});
-  problems.push({fn: 'cos', arg: toRadians(degrees), type: 'radians', answer: cos});
-  if (includeTan) problems.push({fn: 'tan', arg: toRadians(degrees), type: 'radians', answer: tan});
-  if (includeCot) problems.push({fn: 'cot', arg: toRadians(degrees), type: 'radians', answer: invert(tan)});
-  if (includeSec) problems.push({fn: 'sec', arg: toRadians(degrees), type: 'radians', answer: invert(cos)});
-  if (includeCsc) problems.push({fn: 'csc', arg: toRadians(degrees), type: 'radians', answer: invert(sin)});
-}
+      problems.push({fn:'sin', arg:deg, type:'degrees', answer:sin});
+      problems.push({fn:'cos', arg:deg, type:'degrees', answer:cos});
+      if (includeTan) problems.push({fn:'tan', arg:deg, type:'degrees', answer:tan});
+      if (includeCot) problems.push({fn:'cot', arg:deg, type:'degrees', answer: invert(tan)});
+      if (includeSec) problems.push({fn:'sec', arg:deg, type:'degrees', answer: invert(cos)});
+      if (includeCsc) problems.push({fn:'csc', arg:deg, type:'degrees', answer: invert(sin)});
+    }
+    if (radians) {
+      // if radians requested, use a simple fraction representation for common angles
+      function toRad(d) {
+        if (d === 0) return 0;
+        const base = ((d % 180) + 180) % 180;
+        const map = {0:[0,1],30:[1,6],45:[1,4],60:[1,3],90:[1,2],120:[2,3],135:[3,4],150:[5,6]};
+        const pair = map[base] || [base,180];
+        const diff = (d - base) / 180;
+        return [ pair[0] + pair[1]*diff, pair[1] ];
+      }
+      problems.push({fn:'sin', arg:toRad(deg), type:'radians', answer:sin});
+      problems.push({fn:'cos', arg:toRad(deg), type:'radians', answer:cos});
+      if (includeTan) problems.push({fn:'tan', arg:toRad(deg), type:'radians', answer:tan});
+      if (includeCot) problems.push({fn:'cot', arg:toRad(deg), type:'radians', answer: invert(tan)});
+      if (includeSec) problems.push({fn:'sec', arg:toRad(deg), type:'radians', answer: invert(cos)});
+      if (includeCsc) problems.push({fn:'csc', arg:toRad(deg), type:'radians', answer: invert(sin)});
+    }
   }
+
   if (deg90s) {
-    angle(0);
-    angle(90);
-    if (!quadIOnly) {
-      angle(180);
-      angle(270);
-    }
+    addAngle(0);
+    addAngle(90);
+    if (!quadIOnly) { addAngle(180); addAngle(270); }
   }
-  if (include360) angle(360);
+  if (include360) addAngle(360);
   if (deg30s) {
-    angle(30);
-    angle(60);
-    if (!quadIOnly) {
-      angle(120);
-      angle(150);
-      angle(210);
-      angle(240);
-      angle(300);
-      angle(330);
-    }
+    addAngle(30); addAngle(60);
+    if (!quadIOnly) { addAngle(120); addAngle(150); addAngle(210); addAngle(240); addAngle(300); addAngle(330); }
   }
   if (deg45s) {
-    angle(45);
-    if (!quadIOnly) {
-      angle(135);
-      angle(225);
-      angle(315);
-    }
+    addAngle(45);
+    if (!quadIOnly) { addAngle(135); addAngle(225); addAngle(315); }
   }
+
   return problems;
 }
-function shuffle(arr) {
-  for (let i = 0; i < arr.length; i++) {
-    const index = Math.floor(Math.random() * (arr.length - i)) + i;
-    arr.splice(0, 0, arr.splice(index, 1)[0]);
-  }
-  return arr;
-}
+
+/* ---------- UI wiring ---------- */
 const checkboxes = {
   useDegrees: document.getElementById('degrees'),
   radians: document.getElementById('radian'),
@@ -304,129 +273,218 @@ const checkboxes = {
   showTime: document.getElementById('showtime'),
   limit20: document.getElementById('limit20')
 };
-const clock = document.getElementById('clock');
+
 const problemsWrapper = document.getElementById('problems');
-const score = document.getElementById('score');
-let problems, problem, wrongs, rights, startTime, clockStopper = null, playing = false;
-function startClock() {
-  clock.textContent = formatTime(Date.now() - startTime);
-  clockStopper = window.requestAnimationFrame(startClock);
+const solutions = document.getElementById('solutions');
+const scoreEl = document.getElementById('score');
+const clock = document.getElementById('clock');
+
+let problems = [], current = 0, rights = 0, wrongs = 0, playing = false, startTime = 0, clockRAF = null;
+
+function shuffle(arr) {
+  for (let i=arr.length-1;i>0;i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
 }
-function formatTime(time) {
-  const minutes = Math.floor(time / 60000);
-  const seconds = Math.floor(time / 1000) % 60;
-  const milliseconds = time % 1000;
-  return minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
-}
-document.getElementById('start').addEventListener('click', e => {
-  if (playing) return;
-  const options = {};
-  Object.keys(checkboxes).forEach(key => options[key] = checkboxes[key].checked);
-  problems = generateDrill({
-  useDegrees: options.useDegrees,
-  radians: options.radians,
-  tan: options.tan,
-  cot: options.cot,
-  sec: options.sec,
-  csc: options.csc,
-  deg90s: options.deg90s,
-  deg30s: options.deg30s,
-  deg45s: options.deg45s,
-  include360: options.include360,
-  coterminal: options.coterminal,
-  quadIOnly: options.quadIOnly
+
+/* Build HTML for solution display map (so we can render answers in the problem area) */
+const solutionHTMLs = {};
+Array.from(solutions.children).forEach(el=>{
+  solutionHTMLs[el.dataset.answer] = el.innerHTML;
+  // allow also mapping for plain text like 'rt2' etc.
 });
 
-problems = shuffle(problems);
-  if (!problems.length) {
-    alert('Your settings disallow problems of any kind. Make them more lenient please!');
-    return;
-  }
-  if (options.limit20) {
-    problems = problems.slice(0, 20);
-  }
-  if (options.showCorrectness) document.body.classList.add('show-wrong');
-  else document.body.classList.remove('show-wrong');
-  if (options.showCorrect) document.body.classList.add('show-correct');
-  else document.body.classList.remove('show-correct');
-  if (options.showTime) document.body.classList.add('show-time');
+/* Format how an answer is printed in the problem-area (when revealed) */
+function solutionFor(answer) {
+  if (answer === null) return '<span class="small">undefined</span>';
+  if (answer === 0 || answer === 1 || answer === -1) return String(answer);
+  // prefer the provided solution HTML when available
+  if (solutionHTMLs[answer]) return solutionHTMLs[answer];
+  // fallback: prettify string
+  return (''+answer).replace('rt','√');
+}
+
+/* format the displayed time */
+function formatTime(ms) {
+  const m = Math.floor(ms/60000).toString().padStart(2,'0');
+  const s = Math.floor(ms/1000)%60;
+  const sec = s.toString().padStart(2,'0');
+  const ms3 = Math.floor(ms%1000).toString().padStart(3,'0');
+  return `${m}:${sec}.${ms3}`;
+}
+
+function startClock() {
+  const now = Date.now();
+  clock.textContent = formatTime(now - startTime);
+  clockRAF = requestAnimationFrame(startClock);
+}
+
+function stopClock() {
+  if (clockRAF) cancelAnimationFrame(clockRAF);
+  clockRAF = null;
+}
+
+/* render the current problems into the center column */
+function renderProblems() {
   let html = '';
-  problems.forEach(({fn, arg, type, answer}) => {
-    html += `<div class="problem"><span class="answer">${solutionHTMLs[answer]}</span><span><span class="fn">${fn}</span>`;
-    if (type === 'degrees') html += arg + '&deg;';
-    else if (arg === 0) html += 0;
-    else if (arg[1] === 1) html += (arg[0] === 1 ? '' : arg[0]) + '&pi;';
-    else html += `<span class="frac"><span class="numer">${arg[0] === 1 ? '' : arg[0]}&pi;</span><span class="denom">${arg[1]}</span></span>`;
+  problems.forEach((p, idx) => {
+    const probClass = idx===current ? 'problem current' : 'problem';
+    const answerHTML = (idx < current) ? `<span class="answer">${solutionFor(p.answer)}</span>` : `<span class="answer"></span>`;
+    html += `<div class="${probClass}" data-index="${idx}">${answerHTML}<span><span class="fn">${p.fn}</span> `;
+    if (p.type === 'degrees') html += `${p.arg}&deg;`;
+    else if (p.arg === 0) html += '0';
+    else if (Array.isArray(p.arg) && p.arg[1] === 1) html += (p.arg[0] ===1 ? '' : p.arg[0]) + '&pi;';
+    else if (Array.isArray(p.arg)) html += `<span class="frac"><span class="numer">${p.arg[0]===1? '' : p.arg[0]}&pi;</span><span class="denom">${p.arg[1]}</span></span>`;
     html += '</span></div>';
   });
   problemsWrapper.innerHTML = html;
-  problemsWrapper.children[0].classList.add('current');
-  wrongs = rights = 0;
-  startTime = Date.now();
-  startClock();
-  document.body.style.setProperty('--problem-n', problem = 0);
-  document.body.classList.remove('show-intro-modal');
-  playing = true;
-});
-const keyCodeToAnswer = {
-  // 49: 0, 50: 0, 51: null, 52: null,
-  81: '1/2', 87: 'rt2/2', 69: 'rt3/2', 82: '1',
-  65: '-1/2', 83: '-rt2/2', 68: '-rt3/2', 70: '-1',
-  32: '0'
-};
-document.addEventListener('keydown', e => {
-  if (keyCodeToAnswer[e.keyCode]) submitAnswer(keyCodeToAnswer[e.keyCode]);
-});
-const solutions = document.getElementById('solutions');
-const solutionHTMLs = {};
-Array.from(solutions.children).forEach(solution => {
-  solutionHTMLs[solution.dataset.answer] = renderRT(solution.innerHTML);
-});
-solutions.addEventListener('click', e => {
-  const solution = e.target.closest('.solution');
-  if (solution) submitAnswer(solution.dataset.answer);
-});
-      // Right-click to submit the negative of a solution
-solutions.addEventListener('contextmenu', e => {
-  e.preventDefault();
-  const solution = e.target.closest('.solution');
-  if (solution) {
-    let answer = solution.dataset.answer;
-    if (answer && answer !== '0' && answer !== '1' && answer !== 'null') {
-      answer = answer.startsWith('-') ? answer.slice(1) : '-' + answer;
-    }
-    submitAnswer(answer);
-  }
-});
-function submitAnswer(answer) {
+  // ensure current exists and is highlighted
+  const cur = problemsWrapper.querySelector('.problem.current');
+  if (cur) cur.scrollIntoView({block:'center'});
+}
+
+/* submit an answer value (string/number/null) */
+function submitAnswer(rawAnswer) {
   if (!playing) return;
-  if (answer === '0' || answer === '1' || answer === '-1') answer = +answer;
-  else if (answer === 'null') answer = null;
-  if (answer === problems[problem].answer) {
-    problemsWrapper.children[problem].classList.add('correct');
+  let answer = rawAnswer;
+  if (answer === 'null') answer = null;
+  else if (answer === '0' || answer === '1' || answer === '-1') answer = +answer;
+  // match exact string for string answers
+  const correct = problems[current].answer;
+  const matched = (answer === correct) || (String(answer) === String(correct));
+  const problemEl = problemsWrapper.children[current];
+  if (matched) {
+    problemEl.classList.add('correct');
     rights++;
   } else {
-    problemsWrapper.children[problem].classList.add('wrong');
+    problemEl.classList.add('wrong');
     wrongs++;
+    // reveal correct answer immediately
+    const ansSpan = problemEl.querySelector('.answer');
+    if (ansSpan) ansSpan.innerHTML = solutionFor(correct);
   }
-  problemsWrapper.children[problem].classList.remove('current');
-  problem++;
-  if (problem >= problems.length) {
+  // reveal user's answer (if positive) in answer slot (for clarity) unless it was null
+  const userAnsSpan = problemEl.querySelector('.answer');
+  if (userAnsSpan && answer !== null) userAnsSpan.innerHTML = solutionFor(answer);
+
+  // advance
+  problemEl.classList.remove('current');
+  current++;
+  document.body.style.setProperty('--problem-n', current);
+  if (current >= problems.length) {
+    // finished
     playing = false;
-    window.cancelAnimationFrame(clockStopper);
-    const time = Date.now() - startTime;
-    score.innerHTML = `It took you <strong>${formatTime(time)}</strong> to get <strong>${rights}</strong> out of ${problems.length} correct. That means it'll take you ${formatTime(Math.round(time / problems.length * 20))} to do 20 problems.`;
+    stopClock();
+    const timeTaken = Date.now() - startTime;
+    // show score modal
+    scoreEl.innerHTML = `It took you <strong>${formatTime(timeTaken)}</strong> to get <strong>${rights}</strong> out of ${problems.length} correct.`;
     document.body.classList.add('show-intro-modal');
     document.body.classList.add('show-score');
     document.body.classList.remove('show-time');
+    document.body.classList.add('show-intro-modal'); // show menu modal
+    // show only score modal
     return;
   }
-  document.body.style.setProperty('--problem-n', problem);
-  problemsWrapper.children[problem].classList.add('current');
+  // mark new current
+  const next = problemsWrapper.children[current];
+  if (next) next.classList.add('current');
 }
-document.getElementById('menu').addEventListener('click', e => {
-  document.body.classList.remove('show-score');
+
+/* hook up solution buttons */
+solutions.addEventListener('click', e => {
+  const el = e.target.closest('.solution');
+  if (!el) return;
+  const answer = el.dataset.answer;
+  submitAnswer(answer);
 });
-    </script>
-  </body>
+
+/* right-click => submit negative version (if not 0/null) */
+solutions.addEventListener('contextmenu', e => {
+  const el = e.target.closest('.solution');
+  if (!el) return;
+  e.preventDefault();
+  let ans = el.dataset.answer;
+  if (ans === 'null') { submitAnswer('null'); return; }
+  if (ans === '0') { submitAnswer('0'); return; }
+  // toggle sign
+  ans = ans.startsWith('-') ? ans.slice(1) : '-' + ans;
+  submitAnswer(ans);
+});
+
+/* keyboard shortcuts - map some keys to the solution buttons (optional) */
+document.addEventListener('keydown', e => {
+  // map Q W E R T Y U I O P A S to the buttons
+  const key = e.key.toUpperCase();
+  const el = Array.from(solutions.children).find(c => c.dataset.key === key);
+  if (el) {
+    e.preventDefault();
+    submitAnswer(el.dataset.answer);
+  }
+});
+
+/* Start button: assemble options, create problems, shuffle, render, show UI */
+document.getElementById('start').addEventListener('click', () => {
+  if (playing) return;
+  // collect options
+  const opts = {};
+  Object.keys(checkboxes).forEach(k => opts[k] = checkboxes[k].checked);
+  // generate problems
+  problems = generateDrill({
+    useDegrees: opts.useDegrees,
+    radians: opts.radians,
+    includeTan: opts.tan,
+    includeCot: opts.cot,
+    includeSec: opts.sec,
+    includeCsc: opts.csc,
+    deg90s: opts.deg90s,
+    deg30s: opts.deg30s,
+    deg45s: opts.deg45s,
+    include360: opts.include360,
+    coterminal: opts.coterminal,
+    quadIOnly: opts.quadIOnly
+  });
+
+  problems = shuffle(problems);
+  if (opts.limit20) problems = problems.slice(0,20);
+  if (!problems.length) { alert('No problems with these options — relax some filters.'); return; }
+
+  // reset state
+  current = 0; rights = 0; wrongs = 0;
+  // render problems and show solutions
+  renderProblems();
+  document.body.classList.remove('show-intro-modal', 'show-score');
+  if (opts.showTime) document.body.classList.add('show-time'); else document.body.classList.remove('show-time');
+  if (opts.showCorrectness) document.body.classList.add('show-wrong'); else document.body.classList.remove('show-wrong');
+  if (opts.showCorrect) document.body.classList.add('show-correct'); else document.body.classList.remove('show-correct');
+
+  // reveal solution grid
+  solutions.setAttribute('aria-hidden','false');
+  // highlight first problem
+  const first = problemsWrapper.querySelector('.problem');
+  if (first) first.classList.add('current');
+
+  // start clock
+  startTime = Date.now();
+  startClock();
+
+  playing = true;
+});
+
+/* Menu (back to options) button on score modal */
+document.getElementById('menu').addEventListener('click', () => {
+  // hide score modal, return to options
+  document.body.classList.remove('show-score');
+  document.body.classList.add('show-intro-modal');
+  solutions.setAttribute('aria-hidden','true');
+  problemsWrapper.innerHTML = '';
+});
+
+/* initially hide solutions and problems until Start */
+solutions.setAttribute('aria-hidden','true');
+document.body.classList.add('show-intro-modal');
+
+</script>
+</body>
 </html>
