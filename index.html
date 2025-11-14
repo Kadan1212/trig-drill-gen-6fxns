@@ -503,8 +503,7 @@ document.getElementById('start').addEventListener('click', () => {
   if (opts.showCorrectness) document.body.classList.add('show-wrong'); else document.body.classList.remove('show-wrong');
   if (opts.showCorrect) document.body.classList.add('show-correct'); else document.body.classList.remove('show-correct');
 
-  // reveal solution grid
-   = 'grid';      // show the solutions grid
+  solutions.style.display = 'grid';      // show the solutions grid
 solutions.style.pointerEvents = 'auto';  // ensure buttons are clickable
 solutions.setAttribute('aria-hidden','false'); // accessibility
   // highlight first problem
