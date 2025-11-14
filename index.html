@@ -498,20 +498,7 @@ function renderProblems() {
   if (cur) cur.scrollIntoView({block:'center'});
   document.body.style.setProperty('--problem-n', current);
 }
-  if (current >= problems.length) {
-    // finished
-    playing = false;
-    stopClock();
-    const timeTaken = Date.now() - startTime;
-    // show score modal
-    scoreEl.innerHTML = `It took you <strong>${formatTime(timeTaken)}</strong> to get <strong>${rights}</strong> out of ${problems.length} correct.`;
-    document.body.classList.add('show-intro-modal');
-    document.body.classList.add('show-score');
-    document.body.classList.remove('show-time');
-    document.body.classList.add('show-intro-modal'); // show menu modal
-    // show only score modal
-    return;
-  }
+
   // mark new current
   const next = problemsWrapper.children[current];
   if (next) next.classList.add('current');
