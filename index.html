@@ -17,6 +17,7 @@
     /* container visibility states */
     body.show-intro-modal .intro-modal { display:flex; }
     body.show-intro-modal .solutions { display:none; }
+    body.show-solutions .solutions { display: grid; }
     body.show-intro-modal .problems { display:none; }
     body.show-score .intro-modal.not-score { display:none; }
     /* modal */
@@ -75,7 +76,7 @@
     <h1>Trig Drill Generator</h1>
     <h2>Options</h2>
     <div class="options">
-      <p><input type="checkbox" id="degrees" > <label for="degrees">Degrees?</label></p>
+      <p><input type="checkbox" id="degrees" checked> <label for="degrees">Degrees?</label></p>
       <p><input type="checkbox" id="radian" checked> <label for="radian">Radians?</label></p>
 
       <p><input type="checkbox" id="tan" checked> <label for="tan">Include tan problems?</label></p>
@@ -174,7 +175,7 @@ function invert(value) {
     '2': '1/2',
     '1/3': '3',
     '3/2': '2/3',
-    '2rt3/3': '3/(2rt3)'  // unlikely used but present for completeness
+    '2rt3/3': '(2√3)/3'
   };
   const res = map[v] || (1 / parseFloat(v));
   return neg ? '-' + res : res;
@@ -203,6 +204,10 @@ const answers = {
   360:  [0, 1, 0]
 };
 function getAnswers(deg) {
+  deg = ((deg % 360) + 360) % 360;
+
+if (answers[deg] !== undefined) return answers[deg].slice();
+if (deg === 360) return answers[0].slice(); // explicit 360
   deg = ((deg % 360) + 360) % 360; // normalize to 0–359
 
   // exact matches in Q1
@@ -370,7 +375,7 @@ function solutionFor(answer) {
   // prefer the provided solution HTML when available
   if (solutionHTMLs[answer]) return solutionHTMLs[answer];
   // fallback: prettify string
-  return (''+answer).replace('rt','√');
+  return (''+answer).replace(/rt/g,'√');
 }
 
 /* format the displayed time */
@@ -415,8 +420,8 @@ function renderProblems() {
   // highlight current
   const cur = problemsWrapper.querySelector('.problem.current');
   if (cur) cur.scrollIntoView({block:'center'});
-}
   document.body.style.setProperty('--problem-n', current);
+}
   if (current >= problems.length) {
     // finished
     playing = false;
@@ -504,8 +509,9 @@ document.getElementById('start').addEventListener('click', () => {
   if (opts.showCorrect) document.body.classList.add('show-correct'); else document.body.classList.remove('show-correct');
 
   solutions.style.display = 'grid';      // show the solutions grid
-solutions.style.pointerEvents = 'auto';  // ensure buttons are clickable
-solutions.setAttribute('aria-hidden','false'); // accessibility
+  solutions.style.pointerEvents = 'auto';  // ensure buttons are clickable
+  solutions.setAttribute('aria-hidden','false'); // accessibility
+  document.body.classList.add('show-solutions');
   // highlight first problem
   const first = problemsWrapper.querySelector('.problem');
   if (first) first.classList.add('current');
