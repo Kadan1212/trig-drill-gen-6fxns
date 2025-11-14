@@ -56,6 +56,12 @@
     body.show-intro-modal .solutions {
   display: none;
 }
+    .sqrt {
+  display: inline-block;
+  text-decoration: overline;
+  font-size: 0.9em;
+  padding-left: 2px;
+}
   </style>
 </head>
 <body class="show-intro-modal">
@@ -116,6 +122,10 @@
 
   <div class="clock" id="clock">3:00</div>
     <script>
+      function renderRT(str) {
+  // Replace rtX with √X
+  return str.replace(/rt(\d+)/g, `<span class="sqrt">$1</span>`);
+}
 function generateDrill({
   useDegrees = true,
   radians = false,
@@ -367,7 +377,7 @@ document.addEventListener('keydown', e => {
 const solutions = document.getElementById('solutions');
 const solutionHTMLs = {};
 Array.from(solutions.children).forEach(solution => {
-  solutionHTMLs[solution.dataset.answer] = solution.innerHTML;
+  solutionHTMLs[solution.dataset.answer] = renderRT(solution.innerHTML);
 });
 solutions.addEventListener('click', e => {
   const solution = e.target.closest('.solution');
