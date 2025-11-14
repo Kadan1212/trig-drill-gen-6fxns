@@ -6,67 +6,141 @@
   <title>Trig Drill Generator</title>
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
   <style>
-    /* FRACTIONS & SQUARE ROOTS */
-    .frac { display:inline-block; vertical-align:middle; text-align:center; font-size:0.5em; margin:0 0.1em; }
-    .numer { display:table; border-bottom:0.03em solid currentColor; vertical-align:middle; }
-    .sqrt { margin:0 0.1em; position:relative; }
-    .sqrt::before { content:'√'; }
-    .sqrt::after { content:''; display:block; position:absolute; top:0.25em; left:0.9ch; right:0; border-top:0.03em solid currentColor; height:1px; }
+/* FRACTIONS & SQUARE ROOTS */
+.frac { display:inline-block; vertical-align:middle; text-align:center; font-size:0.5em; margin:0 0.1em; }
+.numer { display:table; border-bottom:0.03em solid currentColor; vertical-align:middle; }
+.sqrt { margin:0 0.1em; position:relative; }
+.sqrt::before { content:'√'; }
+.sqrt::after { content:''; display:block; position:absolute; top:0.25em; left:0.9ch; right:0; border-top:0.03em solid currentColor; height:1px; }
 
-    html,body { height:100%; width:100%; margin:0; font-family:"Open Sans",sans-serif; color:#333; background:#fbfbfb; --problem-n:0; font-size:0; overflow:hidden; display:flex; justify-content:center; align-items:center; }
-    /* container visibility states */
-    body.show-intro-modal .intro-modal { display:flex; }
-    body.show-intro-modal .solutions { display:none; }
-    body.show-solutions .solutions { display: grid; }
-    body.show-intro-modal .problems { display:none; }
-    body.show-score .intro-modal.not-score { display:none; }
-    /* modal */
-    .intro-modal { box-shadow:0 3px 20px rgba(0,0,0,0.45); border-radius:20px; padding:28px; display:none; flex-direction:column; width:380px; box-sizing:border-box; background:white; }
-    h1 { margin:0 0 12px 0; font-weight:normal; font-size:28px; }
-    h2 { margin:0 0 12px 0; font-weight:normal; color:#666; font-size:14px; }
-    #start,#menu { background:#2092e3; color:white; border:none; padding:10px; border-radius:10px; font-size:16px; cursor:pointer; width:100%; margin-top:10px; }
-    .options { max-height:40vh; overflow:auto; margin-top:6px; }
-    .options p { margin:8px 0; font-size:14px; }
-    .options label, .options input[type=checkbox] { cursor:pointer; }
-
-    /* problems area */
-    .problems { padding-top:40vh; margin-top:calc(var(--problem-n) * -20vh); transition:margin-top .2s; width:50vw; box-sizing:border-box; }
-    .problem { font-size:14vh; font-family:serif; padding:3vh 3vw; width:50vw; min-width:50vh; height:20vh; border-right:3px solid rgba(0,0,0,0.08); box-sizing:border-box; text-align:right; opacity:0.5; position:relative; transition:opacity .15s, color .15s, background .15s; }
-    .problem.current { opacity:1; color:#000; background:transparent; }
-    .answer { position:absolute; left:10px; top:0; bottom:0; display:flex; align-items:center; opacity:0; font-size:0.5em; transition:opacity .15s; }
-    .problem.correct { color:#0a530a; }
-    .problem.wrong { color:#d12525; }
-    .problem.correct .answer, .problem.wrong .answer { opacity:1; }
-
-   /* solutions grid: 3 columns x 4 rows */
-.solutions {
-  z-index: 1;        /* bring it above problems */
-  pointer-events: auto; /* ensure clicks register */
-  width: 36vw;                  /* smaller right panel */
-  position: fixed;
-  right: 0;
-  top: 0;
-  height: 100%;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: 1fr;
-  gap: 16px;
-  padding: 24px;
-  box-sizing: border-box;
-  align-content: center;
-  justify-items: stretch;
+/* BASE STYLES */
+html,body {
+  height:100%;
+  width:100%;
+  margin:0;
+  font-family:"Open Sans",sans-serif;
+  color:#333;
+  background:#fbfbfb;
+  --problem-n:0;
+  font-size:0;
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
-    /* score modal */
-    .intro-modal.score { display:none; width:500px; }
-    body.show-score .intro-modal.score { display:flex; }
-    body.show-score .intro-modal.not-score { display:none; }
+/* CONTAINER STATES */
+body.show-intro-modal .intro-modal { display:flex; }
+body.show-intro-modal .solutions { display:none; }
+body.show-solutions .solutions { display:grid; }
+body.show-intro-modal .problems { display:none; }
+body.show-score .intro-modal.not-score { display:none; }
 
-    @media (max-width: 900px) {
-      .intro-modal { width:320px; }
-      .solutions { position:fixed; bottom:0; top:auto; width:100%; height:50vh; grid-template-columns: repeat(3,1fr); padding:14px; gap:10px; }
-      .problems, .problem { width:100vw; min-width:0; }
-    }
+/* MODALS */
+.intro-modal {
+  box-shadow:0 3px 20px rgba(0,0,0,0.45);
+  border-radius:20px;
+  padding:28px;
+  display:none;
+  flex-direction:column;
+  width:380px;
+  box-sizing:border-box;
+  background:white;
+}
+h1 { margin:0 0 12px 0; font-weight:normal; font-size:28px; }
+h2 { margin:0 0 12px 0; font-weight:normal; color:#666; font-size:14px; }
+#start,#menu {
+  background:#2092e3;
+  color:white;
+  border:none;
+  padding:10px;
+  border-radius:10px;
+  font-size:16px;
+  cursor:pointer;
+  width:100%;
+  margin-top:10px;
+}
+.options { max-height:40vh; overflow:auto; margin-top:6px; }
+.options p { margin:8px 0; font-size:14px; }
+.options label, .options input[type=checkbox] { cursor:pointer; }
+
+/* PROBLEMS AREA */
+.problems {
+  padding-top:40vh;
+  margin-top:calc(var(--problem-n) * -20vh);
+  transition:margin-top .2s;
+  width:50vw;
+  box-sizing:border-box;
+}
+.problem {
+  font-size:14vh;
+  font-family:serif;
+  padding:3vh 3vw;
+  width:50vw;
+  min-width:50vh;
+  height:20vh;
+  border-right:3px solid rgba(0,0,0,0.08);
+  box-sizing:border-box;
+  text-align:right;
+  opacity:0.5;
+  position:relative;
+  transition:opacity .15s, color .15s, background .15s;
+}
+.problem.current { opacity:1; color:#000; background:transparent; }
+.answer {
+  position:absolute;
+  left:10px;
+  top:0;
+  bottom:0;
+  display:flex;
+  align-items:center;
+  opacity:0;
+  font-size:0.5em;
+  transition:opacity .15s;
+}
+.problem.correct { color:#0a530a; }
+.problem.wrong { color:#d12525; }
+.problem.correct .answer, .problem.wrong .answer { opacity:1; }
+
+/* SOLUTIONS GRID */
+.solutions {
+  z-index:1;
+  pointer-events:auto;
+  width:36vw;
+  position:fixed;
+  right:0;
+  top:0;
+  height:100%;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-auto-rows:1fr;
+  gap:16px;
+  padding:24px;
+  box-sizing:border-box;
+  align-content:center;
+  justify-items:stretch;
+}
+
+/* SCORE MODAL */
+.intro-modal.score { display:none; width:500px; }
+body.show-score .intro-modal.score { display:flex; }
+body.show-score .intro-modal.not-score { display:none; }
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .intro-modal { width:320px; }
+  .solutions {
+    position:fixed;
+    bottom:0;
+    top:auto;
+    width:100%;
+    height:50vh;
+    grid-template-columns: repeat(3,1fr);
+    padding:14px;
+    gap:10px;
+  }
+  .problems, .problem { width:100vw; min-width:0; }
+}
   </style>
 </head>
 <body class="show-intro-modal">
@@ -476,11 +550,13 @@ document.addEventListener('keydown', e => {
 /* Start button: assemble options, create problems, shuffle, render, show UI */
 document.getElementById('start').addEventListener('click', () => {
   if (playing) return;
+
   // collect options
   const opts = {};
   Object.keys(checkboxes).forEach(k => opts[k] = checkboxes[k].checked);
+
   // generate problems
-  problems = generateDrill({
+  problems = shuffle(generateDrill({
     useDegrees: opts.useDegrees,
     radians: opts.radians,
     includeTan: opts.tan,
@@ -493,28 +569,26 @@ document.getElementById('start').addEventListener('click', () => {
     include360: opts.include360,
     coterminal: opts.coterminal,
     quadIOnly: opts.quadIOnly
-  });
+  }));
 
-  problems = shuffle(problems);
   if (opts.limit20) problems = problems.slice(0,20);
-  if (!problems.length) { alert('No problems with these options — relax some filters.'); return; }
+
+  if (!problems.length) {
+    alert('No problems with these options — try relaxing some filters.');
+    return;
+  }
 
   // reset state
   current = 0; rights = 0; wrongs = 0;
-  // render problems and show solutions
+
+  // render problems and show UI
   renderProblems();
   document.body.classList.remove('show-intro-modal', 'show-score');
-  if (opts.showTime) document.body.classList.add('show-time'); else document.body.classList.remove('show-time');
-  if (opts.showCorrectness) document.body.classList.add('show-wrong'); else document.body.classList.remove('show-wrong');
-  if (opts.showCorrect) document.body.classList.add('show-correct'); else document.body.classList.remove('show-correct');
-
-  solutions.style.display = 'grid';      // show the solutions grid
-  solutions.style.pointerEvents = 'auto';  // ensure buttons are clickable
-  solutions.setAttribute('aria-hidden','false'); // accessibility
   document.body.classList.add('show-solutions');
-  // highlight first problem
-  const first = problemsWrapper.querySelector('.problem');
-  if (first) first.classList.add('current');
+
+  // show first problem fully
+  const firstProblem = problemsWrapper.querySelector('.problem');
+  if (firstProblem) firstProblem.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   // start clock
   startTime = Date.now();
@@ -522,7 +596,7 @@ document.getElementById('start').addEventListener('click', () => {
 
   playing = true;
 });
-
+  
 /* Menu (back to options) button on score modal */
 document.getElementById('menu').addEventListener('click', () => {
   // hide score modal, return to options
