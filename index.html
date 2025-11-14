@@ -182,46 +182,65 @@ function invert(value) {
    getAnswers returns [sin, cos, tan] (string/number/null).
 */
 const answers = {
-  0: [0, 1, 0],
-  30: ['1/2', 'rt3/2', 'rt3/3'],
-  45: ['rt2/2', 'rt2/2', 1],
-  60: ['rt3/2', '1/2', 'rt3'],
-  90: [1, 0, null]
+  0:    [0, 1, 0],
+  30:   ['1/2', 'rt3/2', 'rt3/3'],
+  45:   ['rt2/2', 'rt2/2', 1],
+  60:   ['rt3/2', '1/2', 'rt3'],
+  90:   [1, 0, null],
+  120:  ['rt3/2', '-1/2', '-rt3'],
+  135:  ['rt2/2', '-rt2/2', -1],
+  150:  ['1/2', '-rt3/2', '-rt3/3'],
+  180:  [0, -1, 0],
+  210:  ['-1/2', '-rt3/2', rt3/3],
+  225:  ['-rt2/2', '-rt2/2', 1],
+  240:  ['-rt3/2', '-1/2', rt3],
+  270:  [-1, 0, null],
+  300:  ['-rt3/2', '1/2', '-rt3'],
+  315:  ['-rt2/2', 'rt2/2', -1],
+  330:  ['-1/2', 'rt3/2', '-rt3/3'],
+  360:  [0, 1, 0]
 };
 function getAnswers(deg) {
-  deg = ((deg % 360) + 360) % 360;
+  deg = ((deg % 360) + 360) % 360; // normalize to 0–359
+
+  // exact matches in Q1
   if (answers[deg]) return answers[deg].slice();
-  if (deg === 180) { const t = answers[0].slice(); t[1] = -1; return t; }
-  if (deg === 270) { const t = answers[90].slice(); t[0] = -1; return t; }
-  // Q2
-  if (deg > 90 && deg < 180) {
-    const t = answers[180 - deg].slice();
-    if (typeof t[1] === 'string') t[1] = '-' + t[1]; else t[1] *= -1;
-    if (typeof t[2] === 'string') t[2] = '-' + t[2]; else t[2] *= -1;
-    return t;
+
+  // special cases
+  if (deg === 180) { const t = answers[0].slice(); t[0] = 0; t[1] = -1; t[2] = 0; return t; }
+  if (deg === 270) { const t = answers[90].slice(); t[0] = -1; t[1] = 0; t[2] = null; return t; }
+  if (deg === 360) { const t = answers[0].slice(); return t; }
+
+  // Quadrant logic
+  let t;
+  if (deg > 0 && deg < 90) { // Q1
+    t = answers[deg].slice();
+  } else if (deg > 90 && deg < 180) { // Q2
+    t = answers[180 - deg].slice();
+    t[0] = invertSign(t[0]); // sin positive
+    t[1] = invertSign(t[1]); // cos negative
+    t[2] = invertSign(t[2]); // tan negative
+  } else if (deg > 180 && deg < 270) { // Q3
+    t = answers[deg - 180].slice();
+    t[0] = invertSign(t[0]); // sin negative
+    t[1] = invertSign(t[1]); // cos negative
+    t[2] = invertSign(t[2]); // tan positive
+  } else if (deg > 270 && deg < 360) { // Q4
+    t = answers[360 - deg].slice();
+    t[0] = invertSign(t[0]); // sin negative
+    t[1] = invertSign(t[1]); // cos positive
+    t[2] = invertSign(t[2]); // tan negative
+  } else {
+    throw new Error('angle not supported: ' + deg);
   }
-  // Q3
-  if (deg > 180 && deg < 270) {
-    const t = answers[deg - 180].slice();
-    if (typeof t[0] === 'string') t[0] = '-' + t[0]; else t[0] *= -1;
-    if (typeof t[1] === 'string') t[1] = '-' + t[1]; else t[1] *= -1;
-    return t;
-  }
-  if (deg > 180 && deg < 270) {
-  const t = answers[deg - 180].slice();
-  if (typeof t[0] === 'string') t[0] = '-' + t[0]; else t[0] *= -1; // sin
-  if (typeof t[1] === 'string') t[1] = '-' + t[1]; else t[1] *= -1; // cos
-  if (typeof t[2] === 'string') t[2] = '' + t[2]; // tan stays positive
   return t;
-}
-  // Q4
-  if (deg > 270 && deg < 360) {
-    const t = answers[360 - deg].slice();
-    if (typeof t[0] === 'string') t[0] = '-' + t[0]; else t[0] *= -1;
-    if (typeof t[2] === 'string') t[2] = '-' + t[2]; else t[2] *= -1;
-    return t;
+
+  function invertSign(x) {
+    if (x === null) return null;
+    if (typeof x === 'number') return -x;
+    if (typeof x === 'string') return x.startsWith('-') ? x.slice(1) : '-' + x;
+    return x;
   }
-  throw new Error('angle not supported: ' + deg);
 }
 
 /* Build problems based on options: returns array of {fn,arg,type,answer} */
@@ -379,30 +398,22 @@ function renderProblems() {
     const probClass = idx===current ? 'problem current' : 'problem';
     const answerHTML = (idx < current) ? `<span class="answer">${solutionFor(p.answer)}</span>` : `<span class="answer"></span>`;
     html += `<div class="${probClass}" data-index="${idx}">${answerHTML}<span><span class="fn">${p.fn}</span> `;
-    if (p.type === 'degrees') html += `${p.arg}&deg;`;
-    else if (p.arg === 0) html += '0';
-    else if (Array.isArray(p.arg) && p.arg[1] === 1) html += (p.arg[0] ===1 ? '' : p.arg[0]) + '&pi;';
-    else if (Array.isArray(p.arg)) html += `<span class="frac"><span class="numer">${p.arg[0]===1? '' : p.arg[0]}&pi;</span><span class="denom">${p.arg[1]}</span></span>`;
+
+    if (p.type === 'degrees') {
+      html += `${p.arg}&deg;`;
+    } else if (p.type === 'radians') {
+      // p.arg is a string like "π/6" or "2π/3"
+      html += p.arg;
+    }
+
     html += '</span></div>';
   });
   problemsWrapper.innerHTML = html;
-  // ensure current exists and is highlighted
+
+  // highlight current
   const cur = problemsWrapper.querySelector('.problem.current');
   if (cur) cur.scrollIntoView({block:'center'});
 }
-
-/* submit an answer value (string/number/null) */
-function submitAnswer(rawAnswer) {
-  if (!playing) return;
-  let answer = rawAnswer;
-  if (answer === 'null') answer = null;
-  else if (answer === '0' || answer === '1' || answer === '-1') answer = +answer;
-  // match exact string for string answers
-  function normalizeAnswer(ans) {
-  if (ans === null) return 'null';
-  return ('' + ans).replace(/rt/g,'√').replace(/\s/g,'').replace(/^\+/, '');
-}
-
 const correct = problems[current].answer;
 const matched = normalizeAnswer(answer) === normalizeAnswer(correct);
   const problemEl = problemsWrapper.children[current];
