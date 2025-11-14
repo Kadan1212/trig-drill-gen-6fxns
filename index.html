@@ -524,8 +524,10 @@ document.getElementById('start').addEventListener('click', () => {
   if (opts.showCorrect) document.body.classList.add('show-correct'); else document.body.classList.remove('show-correct');
 
   // reveal solution grid
-  solutions.style.display = 'grid';      // show the solutions grid
-solutions.setAttribute('aria-hidden','false'); // update accessibility
+  .display = 'grid';      // show the solutions grid
+solutions.style.display = 'grid';       // make solutions visible
+solutions.style.pointerEvents = 'auto';  // ensure buttons are clickable
+solutions.setAttribute('aria-hidden','false'); // accessibility
   // highlight first problem
   const first = problemsWrapper.querySelector('.problem');
   if (first) first.classList.add('current');
