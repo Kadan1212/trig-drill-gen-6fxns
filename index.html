@@ -37,15 +37,22 @@
     .problem.wrong { color:#d12525; }
     .problem.correct .answer, .problem.wrong .answer { opacity:1; }
 
-    /* solutions grid: 3 columns x 4 rows */
-    .solutions { width:46vw; position:fixed; right:0; top:0; height:100%; display:grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; gap:16px; padding:24px; box-sizing:border-box; align-content:center; justify-items:stretch; }
-    .solution { background:white; border-radius:12px; box-shadow:0 3px 10px rgba(0,0,0,0.18); display:flex; align-items:center; justify-content:center; cursor:pointer; user-select:none; font-size:6vh; position:relative; padding:6px; text-align:center; }
-    .solution.big { font-size:6.5vh; grid-column:auto; } /* kept consistent size for 3x4 */
-    .solution::after { position:absolute; top:6px; left:6px; color:rgba(0,0,0,0.25); font-size:12px; content:attr(data-key); }
-    .solution:active { transform:translateY(1px); }
-    /* hide clock until requested */
-    .clock { position:fixed; top:6px; left:0; width:100%; text-align:center; font-size:18px; color:rgba(0,0,0,0.5); display:none; }
-    body.show-time .clock { display:block; }
+   /* solutions grid: 3 columns x 4 rows */
+.solutions {
+  width: 36vw;                  /* smaller right panel */
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 16px;
+  padding: 24px;
+  box-sizing: border-box;
+  align-content: center;
+  justify-items: stretch;
+}
 
     /* score modal */
     .intro-modal.score { display:none; width:500px; }
