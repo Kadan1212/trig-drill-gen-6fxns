@@ -416,26 +416,6 @@ function renderProblems() {
   const cur = problemsWrapper.querySelector('.problem.current');
   if (cur) cur.scrollIntoView({block:'center'});
 }
-const correct = problems[current].answer;
-const matched = normalizeAnswer(answer) === normalizeAnswer(correct);
-  const problemEl = problemsWrapper.children[current];
-  if (matched) {
-    problemEl.classList.add('correct');
-    rights++;
-  } else {
-    problemEl.classList.add('wrong');
-    wrongs++;
-    // reveal correct answer immediately
-    const ansSpan = problemEl.querySelector('.answer');
-    if (ansSpan) ansSpan.innerHTML = solutionFor(correct);
-  }
-  // reveal user's answer (if positive) in answer slot (for clarity) unless it was null
-  const userAnsSpan = problemEl.querySelector('.answer');
-  if (userAnsSpan && answer !== null) userAnsSpan.innerHTML = solutionFor(answer);
-
-  // advance
-  problemEl.classList.remove('current');
-  current++;
   document.body.style.setProperty('--problem-n', current);
   if (current >= problems.length) {
     // finished
