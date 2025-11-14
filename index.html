@@ -106,7 +106,7 @@ h2 { margin:0 0 12px 0; font-weight:normal; color:#666; font-size:14px; }
 
 /* SOLUTIONS GRID */
 .solutions {
-  z-index:1;
+  z-index:20;
   pointer-events:auto;
   width:36vw;
   position:fixed;
@@ -587,9 +587,7 @@ document.getElementById('start').addEventListener('click', () => {
   renderProblems();
   document.body.classList.remove('show-intro-modal', 'show-score');
   document.body.classList.add('show-solutions');
-  solutions.style.display = 'grid';      // show solutions grid
-  solutions.removeAttribute('aria-hidden'); // accessibility
-
+  
   // show first problem fully
   const firstProblem = problemsWrapper.querySelector('.problem');
   if (firstProblem) firstProblem.scrollIntoView({ behavior: 'smooth', block: 'start' });
