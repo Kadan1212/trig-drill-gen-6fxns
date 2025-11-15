@@ -313,39 +313,37 @@ function generateDrill({
   coterminal = false,
   quadIOnly = false
 } = {}) {
-  const angleTable = {
-  0:   {sin:'0', cos:'1', tan:'0'},
-  30:  {sin:'1/2', cos:'rt3/2', tan:'rt3/3'},
-  45:  {sin:'rt2/2', cos:'rt2/2', tan:'1'},
-  60:  {sin:'rt3/2', cos:'1/2', tan:'rt3'},
-  90:  {sin:'1', cos:'0', tan:'undefined'},
-  120: {sin:'rt3/2', cos:'-1/2', tan:'-rt3'},
-  135: {sin:'rt2/2', cos:'-rt2/2', tan:'-1'},
-  150: {sin:'1/2', cos:'-rt3/2', tan:'-rt3/3'},
-  180: {sin:'0', cos:'-1', tan:'0'},
-  210: {sin:'-1/2', cos:'-rt3/2', tan:'1/3'},
-  225: {sin:'-rt2/2', cos:'-rt2/2', tan:'1'},
-  240: {sin:'-rt3/2', cos:'-1/2', tan:'rt3'},
-  270: {sin:'-1', cos:'0', tan:'undefined'},
-  300: {sin:'-rt3/2', cos:'1/2', tan:'-rt3'},
-  315: {sin:'-rt2/2', cos:'rt2/2', tan:'-1'},
-  330: {sin:'-1/2', cos:'rt3/2', tan:'-rt3/3'},
-  360: {sin:'0', cos:'1', tan:'0'}
+ const answers = {
+  0: [0, 1, 0],
+  30: ['1/2', 'rt3/2', 'rt3/3'],
+  45: ['rt2/2', 'rt2/2', 1],
+  60: ['rt3/2', '1/2', 'rt3'],
+  90: [1, 0, null]
 };
 
-  function getCsc(angle) {
-  const s = angleTable[angle].sin;
-  return s === '0' ? 'undefined' : s.includes('/') ? '1/(' + s + ')' : '1/' + s;
+  function reciprocal(value) {
+  if (value === 0 || value === '0' || value === null) return 'undefined';
+  if (typeof value === 'number') return 1 / value;
+  // keep fraction strings as-is for the buttons
+  switch(value) {
+    case '1/2': return '2';
+    case 'rt2/2': return '2rt2/2'; // adjust if you want simplified
+    case 'rt3/2': return '2rt3/3';
+    case 'rt3/3': return '3/rt3'; // or leave as-is
+    case '1': return '1';
+  }
+  return 'undefined'; // fallback
+}
+function getCsc(angle) {
+  return reciprocal(answers[angle][0]); // 1/sin
 }
 function getSec(angle) {
-  const c = angleTable[angle].cos;
-  return c === '0' ? 'undefined' : c.includes('/') ? '1/(' + c + ')' : '1/' + c;
+  return reciprocal(answers[angle][1]); // 1/cos
 }
 function getCot(angle) {
-  const t = angleTable[angle].tan;
-  return t === '0' || t === 'undefined' ? 'undefined' : t.includes('/') ? '1/(' + t + ')' : '1/' + t;
+  return reciprocal(answers[angle][2]); // 1/tan
 }
-
+  
   function getAnswers(degrees) {
     degrees = (degrees % 360 + 360) % 360;
     if (answers[degrees]) return answers[degrees].slice(); // QUADRANT I
@@ -411,17 +409,17 @@ function getCot(angle) {
   problems.push({fn: 'sin', arg: degrees, type: 'degrees', answer: sin});
   problems.push({fn: 'cos', arg: degrees, type: 'degrees', answer: cos});
   problems.push({fn: 'tan', arg: degrees, type: 'degrees', answer: tan});
-  problems.push({fn: 'cot', arg: degrees, type: 'degrees', answer: cos/tan});
-  problems.push({fn: 'sec', arg: degrees, type: 'degrees', answer: 1/cos});
-  problems.push({fn: 'csc', arg: degrees, type: 'degrees', answer: 1/sin});
+  problems.push({fn: 'cot', arg: degrees, type: 'degrees', answer: reciprocal(tan) });
+  problems.push({fn: 'sec', arg: degrees, type: 'degrees', answer: reciprocal(cos) });
+  problems.push({fn: 'csc', arg: degrees, type: 'degrees', answer: reciprocal(sin) });
 }
 if (radians) {
   problems.push({fn: 'sin', arg: toRadians(degrees), type: 'radians', answer: sin});
   problems.push({fn: 'cos', arg: toRadians(degrees), type: 'radians', answer: cos});
   problems.push({fn: 'tan', arg: toRadians(degrees), type: 'radians', answer: tan});
-  problems.push({fn: 'cot', arg: toRadians(degrees), type: 'radians', answer: cos/tan});
-  problems.push({fn: 'sec', arg: toRadians(degrees), type: 'radians', answer: 1/cos});
-  problems.push({fn: 'csc', arg: toRadians(degrees), type: 'radians', answer: 1/sin});
+  problems.push({fn: 'cot', arg: toRadians(degrees), type: 'radians', answer: reciprocal(tan) });
+  problems.push({fn: 'sec', arg: toRadians(degrees), type: 'radians', answer: reciprocal(cos) });
+  problems.push({fn: 'csc', arg: toRadians(degrees), type: 'radians', answer: reciprocal(sin) });
 }
   }
   if (deg90s) {
