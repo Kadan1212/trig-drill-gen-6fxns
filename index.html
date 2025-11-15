@@ -296,7 +296,7 @@
 
   <!-- Row 4 -->
   <div class="solution" data-key="space" data-answer="0"><span>0</span></div>
-  <div class="solution" data-key="v" data-answer="undefined"><span class="small">undefined</span></div>
+  <div class="solution" data-key="v" data-answer="und"><span class="small">und</span></div>
 </div>
 </div>
     <div class="clock" id="clock">3:00</div>
@@ -317,16 +317,16 @@ function generateDrill({
   30: ['1/2', 'rt3/2', 'rt3/3'],
   45: ['rt2/2', 'rt2/2', 1],
   60: ['rt3/2', '1/2', 'rt3'],
-  90: [1, 0, null]
+  90: [1, 0, 'und']
 };
 
-  function reciprocal(value) {
-  if (value === 0 || value === '0' || value === null || value === undefined) return 'undefined';
+function reciprocal(value) {
+  if (value === 0 || value === '0' || value === null || value === undefined) return 'und';
 
   let negative = false;
   if (typeof value === 'string' && value.startsWith('-')) {
     negative = true;
-    value = value.slice(1); // remove the negative for processing
+    value = value.slice(1);
   }
 
   let result;
@@ -336,8 +336,20 @@ function generateDrill({
     case 'rt3/2': result = '2rt3/3'; break;
     case 'rt3/3': result = '3/rt3'; break;
     case '1': result = '1'; break;
-    default: result = 'undefined';
+    default: result = 'und';
   }
+
+  if (negative && result !== 'und') result = '-' + result;
+  return result;
+}
+
+function formatAnswer(value) {
+  if (value === 0) return '0';
+  if (value === 1) return '1';
+  if (value === -1) return '-1';
+  if (value === null || value === undefined) return 'und';
+  return value.toString();
+}
 
   if (negative && result !== 'undefined') result = '-' + result;
   return result;
@@ -409,13 +421,6 @@ function getCot(angle) {
     return [numer, denom];
   }
   function angle(degrees, getCoterminals = true) {
-    function formatAnswer(value) {
-  if (value === 0) return '0';
-  if (value === 1) return '1';
-  if (value === -1) return '-1';
-  if (value === null || value === undefined) return 'undefined';
-  return value.toString(); // fractions like '1/2', 'rt2/2' remain unchanged
-}
     const [sin, cos, tan] = getAnswers(degrees);
     if (getCoterminals && coterminal) {
       if (degrees !== 360) angle(degrees - 360, false);
