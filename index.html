@@ -313,7 +313,7 @@ function generateDrill({
   coterminal = false,
   quadIOnly = false
 } = {}) {
-  const answers = {
+  const angleTable = {
   0:   {sin:'0', cos:'1', tan:'0'},
   30:  {sin:'1/2', cos:'rt3/2', tan:'rt3/3'},
   45:  {sin:'rt2/2', cos:'rt2/2', tan:'1'},
@@ -323,7 +323,7 @@ function generateDrill({
   135: {sin:'rt2/2', cos:'-rt2/2', tan:'-1'},
   150: {sin:'1/2', cos:'-rt3/2', tan:'-rt3/3'},
   180: {sin:'0', cos:'-1', tan:'0'},
-  210: {sin:'-1/2', cos:'-rt3/2', tan:'1/3'}, // etc
+  210: {sin:'-1/2', cos:'-rt3/2', tan:'1/3'},
   225: {sin:'-rt2/2', cos:'-rt2/2', tan:'1'},
   240: {sin:'-rt3/2', cos:'-1/2', tan:'rt3'},
   270: {sin:'-1', cos:'0', tan:'undefined'},
@@ -332,6 +332,20 @@ function generateDrill({
   330: {sin:'-1/2', cos:'rt3/2', tan:'-rt3/3'},
   360: {sin:'0', cos:'1', tan:'0'}
 };
+
+  function getCsc(angle) {
+  const s = angleTable[angle].sin;
+  return s === '0' ? 'undefined' : s.includes('/') ? '1/(' + s + ')' : '1/' + s;
+}
+function getSec(angle) {
+  const c = angleTable[angle].cos;
+  return c === '0' ? 'undefined' : c.includes('/') ? '1/(' + c + ')' : '1/' + c;
+}
+function getCot(angle) {
+  const t = angleTable[angle].tan;
+  return t === '0' || t === 'undefined' ? 'undefined' : t.includes('/') ? '1/(' + t + ')' : '1/' + t;
+}
+
   function getAnswers(degrees) {
     degrees = (degrees % 360 + 360) % 360;
     if (answers[degrees]) return answers[degrees].slice(); // QUADRANT I
