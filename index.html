@@ -5,9 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <meta name="description" content="A drill quiz generator for my trigonometry class.">
-    <meta property="og:image" content="https://sheeptester.github.io/img/drills-smaller.png">
-    
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
     <style>
       .frac {
         display: inline-block;
@@ -186,9 +183,6 @@
       .solution:last-child {
         grid-column: 1 / 5;
       }
-      /*.solution:nth-child(2) {*/
-      /*  grid-column: 3 / 5;*/
-      /*}*/
       .solution::after {
         position: absolute;
         top: 0;
@@ -279,28 +273,43 @@
     </div>
     <div class="problems" id="problems"></div>
     <div class="solutions" id="solutions">
-  <!-- Row 1 -->
-  <div class="solution" data-key="q" data-answer="rt2/2"><span class="frac"><span class="numer"><span class="sqrt">2</span></span><span class="denom">2</span></span></div>
-  <div class="solution" data-key="w" data-answer="rt2"><span class="sqrt">2</span></div>
-  <div class="solution" data-key="e" data-answer="1"><span>1</span></div>
+      <div class="solution" data-key="q" data-answer="rt2/2"><span class="frac"><span class="numer"><span class="sqrt">2</span></span><span class="denom">2</span></span></div>
+      <div class="solution" data-key="w" data-answer="rt2"><span class="sqrt">2</span></div>
+      <div class="solution" data-key="e" data-answer="1"><span>1</span></div>
+      <div class="solution" data-key="r" data-answer="-rt2/2"><span>-<span class="frac"><span class="numer"><span class="sqrt">2</span></span><span class="denom">2</span></span></span></div>
 
-  <!-- Row 2 -->
-  <div class="solution" data-key="a" data-answer="1/2"><span class="frac"><span class="numer">1</span><span class="denom">2</span></span></div>
-  <div class="solution" data-key="s" data-answer="2"><span>2</span></div>
-  <div class="solution" data-key="d" data-answer="rt3/3"><span class="frac"><span class="numer"><span class="sqrt">3</span></span><span class="denom">3</span></span></div>
+      <div class="solution" data-key="a" data-answer="1/2"><span class="frac"><span class="numer">1</span><span class="denom">2</span></span></div>
+      <div class="solution" data-key="s" data-answer="2"><span>2</span></div>
+      <div class="solution" data-key="d" data-answer="rt3/3"><span class="frac"><span class="numer"><span class="sqrt">3</span></span><span class="denom">3</span></span></div>
+      <div class="solution" data-key="f" data-answer="-1"><span>-1</span></div>
 
-  <!-- Row 3 -->
-  <div class="solution" data-key="z" data-answer="rt3/2"><span class="frac"><span class="numer"><span class="sqrt">3</span></span><span class="denom">2</span></span></div>
-  <div class="solution" data-key="x" data-answer="2rt3/3"><span class="frac"><span class="numer">2<span class="sqrt">3</span></span><span class="denom">3</span></span></div>
-  <div class="solution" data-key="c" data-answer="rt3"><span class="sqrt">3</span></div>
+      <div class="solution" data-key="z" data-answer="rt3/2"><span class="frac"><span class="numer"><span class="sqrt">3</span></span><span class="denom">2</span></span></div>
+      <div class="solution" data-key="x" data-answer="2rt3/3"><span class="frac"><span class="numer">2<span class="sqrt">3</span></span><span class="denom">3</span></span></div>
+      <div class="solution" data-key="c" data-answer="rt3"><span class="sqrt">3</span></div>
+      <div class="solution" data-key="v" data-answer="und"><span class="small">und</span></div>
 
-  <!-- Row 4 -->
-  <div class="solution" data-key="space" data-answer="0"><span>0</span></div>
-  <div class="solution" data-key="v" data-answer="und"><span class="small">und</span></div>
-</div>
-</div>
+      <div class="solution" data-key="space" data-answer="0"><span>0</span></div>
+    </div>
     <div class="clock" id="clock">3:00</div>
     <script>
+// Move formatRadian to global scope
+function formatRadian(deg) {
+  const map = {
+    0: [0,1], 30: [1,6], 45: [1,4], 60: [1,3],
+    90: [1,2], 120: [2,3], 135: [3,4], 150: [5,6],
+    180: [1,1], 210: [7,6], 225: [5,4], 240: [4,3],
+    270: [3,2], 300: [5,3], 315: [7,4], 330: [11,6], 360: [2,1]
+  };
+  
+  const f = map[deg % 360];
+  if (!f) return (deg * Math.PI / 180).toFixed(3);
+  
+  const [num, denom] = f;
+  if (num === 0) return '0';
+  if (denom === 1) return (num===1 ? '' : num) + 'π';
+  return `<span class="frac"><span class="numer">${num===1?'':num}&pi;</span><span class="denom">${denom}</span></span>`;
+}
+
 function generateDrill({
   useDegrees = true,
   radians = false,
@@ -313,144 +322,128 @@ function generateDrill({
   quadIOnly = false
 } = {}) {
 
-function formatAnswer(value) {
-  if (value === 0) return '0';
-  if (value === 1) return '1';
-  if (value === -1) return '-1';
-  if (value === null || value === undefined) return 'und';
-  return value.toString(); // fractions like '1/2', 'rt2/2' remain unchanged
-}
-
-  function formatRadian(deg) {
-  const map = {
-    0: [0,1], 30: [1,6], 45: [1,4], 60: [1,3],
-    90: [1,2], 120: [2,3], 135: [3,4], 150: [5,6],
-    180: [1,1], 210: [7,6], 225: [5,4], 240: [4,3],
-    270: [3,2], 300: [5,3], 315: [7,4], 330: [11,6], 360: [2,1]
-  };
-  
-  const f = map[deg % 360];
-  if (!f) return (deg * Math.PI / 180).toFixed(3); // fallback numeric radians
-  
-  const [num, denom] = f;
-  if (num === 0) return '0';
-  if (denom === 1) return (num===1 ? '' : num) + 'π';
-  return `<span class="frac"><span class="numer">${num===1?'':num}&pi;</span><span class="denom">${denom}</span></span>`;
-}
-  
-function reciprocal(value) {
-  if (value === 0 || value === '0' || value === null || value === undefined) return 'und';
-
-  const mapping = {
-        '1/2': '2',
-        '-1/2': '-2',
-        'rt2/2': 'rt2',
-        '-rt2/2': '-rt2',
-        'rt3/2': '2rt3/3',
-        '-rt3/2': '-2rt3/3',
-        'rt3/3': 'rt3',
-        '-rt3/3': '-rt3',
-        '1': '1',
-        '-1': '-1',
-    '0': 'und'
-};
-
-  let negative = false;
-  if (typeof value === 'string' && value.startsWith('-')) {
-    negative = true;
-    value = value.slice(1);
+  function formatAnswer(value) {
+    if (value === 0) return '0';
+    if (value === 1) return '1';
+    if (value === -1) return '-1';
+    if (value === null || value === undefined) return 'und';
+    return value.toString();
   }
 
-    let result = mapping[value] || (typeof value === 'number' ? 1 / value : 'und');
-    if (negative && result !== 'und') result = '-' + result;
-    return result;
-}
-  
-function getCsc(angle) {
-  return reciprocal(getAnswers(angle)[0]); // 1/sin
-}
-function getSec(angle) {
-  return reciprocal(getAnswers(angle)[1]); // 1/cos
-}
-function getCot(angle) {
-  return reciprocal(getAnswers(angle)[2]); // 1/tan
-}
-  
-  // Exact fraction table for common angles in degrees
-const exactValues = {
-  0:   [0, 1, 0],
-  30:  ['1/2', 'rt3/2', 'rt3/3'],
-  45:  ['rt2/2', 'rt2/2', 1],
-  60:  ['rt3/2', '1/2', 'rt3'],
-  90:  [1, 0, 'und'],
-  180: [0, -1, 0],
-  270: [-1, 0, 'und'],
-  360: [0, 1, 0]
-};
+  function reciprocal(value) {
+    if (value === 0 || value === '0' || value === null || value === undefined) return 'und';
 
-function getAnswers(degrees) {
-  // Normalize to 0–360
-  degrees = ((degrees % 360) + 360) % 360;
+    const mapping = {
+      '1/2': '2',
+      '-1/2': '-2',
+      'rt2/2': 'rt2',
+      '-rt2/2': '-rt2',
+      'rt3/2': '2rt3/3',
+      '-rt3/2': '-2rt3/3',
+      'rt3/3': 'rt3',
+      '-rt3/3': '-rt3',
+      'rt3': 'rt3/3',
+      '-rt3': '-rt3/3',
+      'rt2': 'rt2/2',
+      '-rt2': '-rt2/2',
+      '2': '1/2',
+      '-2': '-1/2',
+      '2rt3/3': 'rt3/2',
+      '-2rt3/3': '-rt3/2',
+      '1': '1',
+      '-1': '-1',
+      '0': 'und'
+    };
 
-  // Check exact table first
-  if (exactValues[degrees] !== undefined) return exactValues[degrees].slice();
+    let result = mapping[value];
+    if (result) return result;
+    
+    // Numeric fallback
+    if (typeof value === 'number' && value !== 0) {
+      return (1 / value).toString();
+    }
+    
+    return 'und';
+  }
 
-  // Otherwise compute numerically
-  const rad = degrees * Math.PI / 180;
-  const sin = Math.round(Math.sin(rad) * 1000) / 1000;
-  const cos = Math.round(Math.cos(rad) * 1000) / 1000;
-  const tan = (cos === 0) ? 'und' : Math.round(Math.tan(rad) * 1000) / 1000;
-
-  return [sin, cos, tan];
-}
-  const problems = [];
-  const radiansMap = {
-     0: [0, 1],  30: [1, 6],  45: [1, 4],  60: [1, 3],
-    90: [1, 2], 120: [2, 3], 135: [3, 4], 150: [5, 6]
+  const exactValues = {
+    0:   [0, 1, 0],
+    30:  ['1/2', 'rt3/2', 'rt3/3'],
+    45:  ['rt2/2', 'rt2/2', 1],
+    60:  ['rt3/2', '1/2', 'rt3'],
+    90:  [1, 0, 'und'],
+    120: ['rt3/2', '-1/2', '-rt3'],
+    135: ['rt2/2', '-rt2/2', -1],
+    150: ['1/2', '-rt3/2', '-rt3/3'],
+    180: [0, -1, 0],
+    210: ['-1/2', '-rt3/2', 'rt3/3'],
+    225: ['-rt2/2', '-rt2/2', 1],
+    240: ['-rt3/2', '-1/2', 'rt3'],
+    270: [-1, 0, 'und'],
+    300: ['-rt3/2', '1/2', '-rt3'],
+    315: ['-rt2/2', 'rt2/2', -1],
+    330: ['-1/2', 'rt3/2', '-rt3/3'],
+    360: [0, 1, 0]
   };
+
+  function getAnswers(degrees) {
+    degrees = ((degrees % 360) + 360) % 360;
+
+    if (exactValues[degrees] !== undefined) return exactValues[degrees].slice();
+
+    const rad = degrees * Math.PI / 180;
+    const sin = Math.round(Math.sin(rad) * 1000) / 1000;
+    const cos = Math.round(Math.cos(rad) * 1000) / 1000;
+    const tan = (cos === 0) ? 'und' : Math.round(Math.tan(rad) * 1000) / 1000;
+
+    return [sin, cos, tan];
+  }
+
+  const problems = [];
+
   function toRadians(degrees) {
     return degrees * Math.PI / 180;
   }
-  function angle(degrees) {
-  // Normalize degrees 0–360
-  degrees = ((degrees % 360) + 360) % 360;
 
-  // Determine which angles to generate, including coterminals
-  const anglesToAdd = [degrees];
-  if (coterminal) {
-    const plus360 = degrees + 360;
-    const minus360 = degrees - 360;
-    if (plus360 <= 360) anglesToAdd.push(plus360);
-    if (minus360 >= 0) anglesToAdd.push(minus360);
+  function angle(degrees) {
+    degrees = ((degrees % 360) + 360) % 360;
+
+    const anglesToAdd = [degrees];
+    if (coterminal) {
+      const plus360 = degrees + 360;
+      const minus360 = degrees - 360;
+      if (plus360 <= 720) anglesToAdd.push(plus360);
+      if (minus360 >= -360) anglesToAdd.push(minus360);
+    }
+
+    anglesToAdd.forEach(deg => {
+      const [sin, cos, tan] = getAnswers(deg);
+      const tanVal = (cos === 0 || tan === 'und') ? 'und' : tan;
+      const cotVal = (sin === 0 || tanVal === 'und') ? 'und' : reciprocal(tanVal);
+      const secVal = (cos === 0) ? 'und' : reciprocal(cos);
+      const cscVal = (sin === 0) ? 'und' : reciprocal(sin);
+
+      if (useDegrees) {
+        problems.push({fn: 'sin', arg: deg, type: 'degrees', answer: formatAnswer(sin)});
+        problems.push({fn: 'cos', arg: deg, type: 'degrees', answer: formatAnswer(cos)});
+        problems.push({fn: 'tan', arg: deg, type: 'degrees', answer: formatAnswer(tanVal)});
+        problems.push({fn: 'cot', arg: deg, type: 'degrees', answer: formatAnswer(cotVal)});
+        problems.push({fn: 'sec', arg: deg, type: 'degrees', answer: formatAnswer(secVal)});
+        problems.push({fn: 'csc', arg: deg, type: 'degrees', answer: formatAnswer(cscVal)});
+      }
+
+      if (radians) {
+        const radArg = toRadians(deg);
+        problems.push({fn: 'sin', arg: radArg, type: 'radians', answer: formatAnswer(sin)});
+        problems.push({fn: 'cos', arg: radArg, type: 'radians', answer: formatAnswer(cos)});
+        problems.push({fn: 'tan', arg: radArg, type: 'radians', answer: formatAnswer(tanVal)});
+        problems.push({fn: 'cot', arg: radArg, type: 'radians', answer: formatAnswer(cotVal)});
+        problems.push({fn: 'sec', arg: radArg, type: 'radians', answer: formatAnswer(secVal)});
+        problems.push({fn: 'csc', arg: radArg, type: 'radians', answer: formatAnswer(cscVal)});
+      }
+    });
   }
 
-  anglesToAdd.forEach(deg => {
-    const [sin, cos, tan] = getAnswers(deg);
-    const tanVal = (cos === 0) ? 'und' : tan;
-    const cotVal = (sin === 0) ? 'und' : reciprocal(tan);
-    const secVal = (cos === 0) ? 'und' : reciprocal(cos);
-    const cscVal = (sin === 0) ? 'und' : reciprocal(sin);
-
-    if (useDegrees) {
-      problems.push({fn: 'sin', arg: deg, type: 'degrees', answer: formatAnswer(sin)});
-      problems.push({fn: 'cos', arg: deg, type: 'degrees', answer: formatAnswer(cos)});
-      problems.push({fn: 'tan', arg: deg, type: 'degrees', answer: formatAnswer(tanVal)});
-      problems.push({fn: 'cot', arg: deg, type: 'degrees', answer: formatAnswer(cotVal)});
-      problems.push({fn: 'sec', arg: deg, type: 'degrees', answer: formatAnswer(secVal)});
-      problems.push({fn: 'csc', arg: deg, type: 'degrees', answer: formatAnswer(cscVal)});
-    }
-
-    if (radians) {
-      const radArg = toRadians(deg);
-      problems.push({fn: 'sin', arg: radArg, type: 'radians', answer: formatAnswer(sin)});
-      problems.push({fn: 'cos', arg: radArg, type: 'radians', answer: formatAnswer(cos)});
-      problems.push({fn: 'tan', arg: radArg, type: 'radians', answer: formatAnswer(tanVal)});
-      problems.push({fn: 'cot', arg: radArg, type: 'radians', answer: formatAnswer(cotVal)});
-      problems.push({fn: 'sec', arg: radArg, type: 'radians', answer: formatAnswer(secVal)});
-      problems.push({fn: 'csc', arg: radArg, type: 'radians', answer: formatAnswer(cscVal)});
-    }
-  });
-}
   if (deg90s) {
     angle(0);
     angle(90);
@@ -482,6 +475,7 @@ function getAnswers(degrees) {
   }
   return problems;
 }
+
 function shuffle(arr) {
   for (let i = 0; i < arr.length; i++) {
     const index = Math.floor(Math.random() * (arr.length - i)) + i;
@@ -489,10 +483,10 @@ function shuffle(arr) {
   }
   return arr;
 }
+
 const checkboxes = {
   useDegrees: document.getElementById('degrees'),
   radians: document.getElementById('radian'),
-  // tan: document.getElementById('tan'),
   deg90s: document.getElementById('deg90s'),
   deg30s: document.getElementById('deg30s'),
   deg45s: document.getElementById('deg45s'),
@@ -504,20 +498,24 @@ const checkboxes = {
   showTime: document.getElementById('showtime'),
   limit20: document.getElementById('limit20')
 };
+
 const clock = document.getElementById('clock');
 const problemsWrapper = document.getElementById('problems');
 const score = document.getElementById('score');
 let problems, problem, wrongs, rights, startTime, clockStopper = null, playing = false;
+
 function startClock() {
   clock.textContent = formatTime(Date.now() - startTime);
   clockStopper = window.requestAnimationFrame(startClock);
 }
+
 function formatTime(time) {
   const minutes = Math.floor(time / 60000);
   const seconds = Math.floor(time / 1000) % 60;
   const milliseconds = time % 1000;
   return minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0') + '.' + milliseconds.toString().padStart(3, '0');
 }
+
 document.getElementById('start').addEventListener('click', e => {
   if (playing) return;
   const options = {};
@@ -535,16 +533,20 @@ document.getElementById('start').addEventListener('click', e => {
   if (options.showCorrect) document.body.classList.add('show-correct');
   else document.body.classList.remove('show-correct');
   if (options.showTime) document.body.classList.add('show-time');
+  
   let html = '';
   problems.forEach(({fn, arg, type, answer}) => {
     html += `<div class="problem"><span class="answer">${solutionHTMLs[answer] || answer}</span><span><span class="fn">${fn}</span>`;
-    if (type === 'degrees') html += arg + '&deg;';
-    else if (arg === 0) html += 0;
-    else if (type === 'radians') {
-    const deg = arg * 180 / Math.PI; // convert radians back to degrees
-    html += formatRadian(deg);       // format as a fraction of π
-}
+    if (type === 'degrees') {
+      html += arg + '&deg;</span></span></div>';
+    } else if (arg === 0) {
+      html += '0</span></span></div>';
+    } else if (type === 'radians') {
+      const deg = arg * 180 / Math.PI;
+      html += formatRadian(deg) + '</span></span></div>';
+    }
   });
+  
   problemsWrapper.innerHTML = html;
   problemsWrapper.children[0].classList.add('current');
   wrongs = rights = 0;
@@ -554,24 +556,29 @@ document.getElementById('start').addEventListener('click', e => {
   document.body.classList.remove('show-intro-modal');
   playing = true;
 });
+
 const keyCodeToAnswer = {
-  // 49: 0, 50: 0, 51: null, 52: null,
-  81: '1/2', 87: 'rt2/2', 69: 'rt3/2', 82: '1',
-  65: '-1/2', 83: '-rt2/2', 68: '-rt3/2', 70: '-1',
+  81: 'rt2/2', 87: 'rt2', 69: '1', 82: '-rt2/2',
+  65: '1/2', 83: '2', 68: 'rt3/3', 70: '-1',
+  90: 'rt3/2', 88: '2rt3/3', 67: 'rt3', 86: 'und',
   32: '0'
 };
+
 document.addEventListener('keydown', e => {
   if (keyCodeToAnswer[e.keyCode]) submitAnswer(keyCodeToAnswer[e.keyCode]);
 });
+
 const solutions = document.getElementById('solutions');
 const solutionHTMLs = {};
 Array.from(solutions.children).forEach(solution => {
   solutionHTMLs[solution.dataset.answer] = solution.innerHTML;
 });
+
 solutions.addEventListener('click', e => {
   const solution = e.target.closest('.solution');
   if (solution) submitAnswer(solution.dataset.answer);
 });
+
 function submitAnswer(answer) {
   if (!playing) return;
   if (answer === problems[problem].answer) {
@@ -596,6 +603,7 @@ function submitAnswer(answer) {
   document.body.style.setProperty('--problem-n', problem);
   problemsWrapper.children[problem].classList.add('current');
 }
+
 document.getElementById('menu').addEventListener('click', e => {
   document.body.classList.remove('show-score');
 });
