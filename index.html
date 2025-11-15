@@ -332,12 +332,23 @@ function reciprocal(value) {
   if (value === 0 || value === '0' || value === null || value === undefined) return 'und';
 
   const mapping = {
-    '1/2': '2',
-    'rt2/2': '2rt2/2',
-    'rt3/2': '2rt3/3',
-    'rt3/3': 'rt3',
-    '1': '1'
-  };
+  '1/2': '2',
+  '-1/2': '-2',
+
+  'rt2/2': 'rt2',
+  '-rt2/2': '-rt2',
+
+  'rt3/2': '2rt3/3',
+  '-rt3/2': '-2rt3/3',
+
+  'rt3/3': 'rt3',
+  '-rt3/3': '-rt3',
+
+  '1': '1',
+  '-1': '-1',
+
+  '0': 'und'
+};
 
   let negative = false;
   if (typeof value === 'string' && value.startsWith('-')) {
