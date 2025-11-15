@@ -334,7 +334,7 @@ function reciprocal(value) {
         'rt3/3': 'rt3',
         '-rt3/3': '-rt3',
         '1': '1',
-        '-1': '-1'
+        '-1': '-1',
     '0': 'und'
 };
 
@@ -350,13 +350,13 @@ function reciprocal(value) {
 }
   
 function getCsc(angle) {
-  return reciprocal(getAnswers[angle][0]); // 1/sin
+  return reciprocal(getAnswers(angle)[0]); // 1/sin
 }
 function getSec(angle) {
-  return reciprocal(getAnswers[angle][1]); // 1/cos
+  return reciprocal(getAnswers(angle)[1]); // 1/cos
 }
 function getCot(angle) {
-  return reciprocal(getAnswers[angle][2]); // 1/tan
+  return reciprocal(getAnswers(angle)[2]); // 1/tan
 }
   
   // Exact fraction table for common angles in degrees
@@ -392,12 +392,7 @@ function getAnswers(degrees) {
     90: [1, 2], 120: [2, 3], 135: [3, 4], 150: [5, 6]
   };
   function toRadians(degrees) {
-    if (degrees === 0) return 0;
-    const base = (degrees % 180 + 180) % 180;
-    const diff = (degrees - base) / 180;
-    let [numer, denom] = radiansMap[base];
-    numer += denom * diff;
-    return [numer, denom];
+    return degrees * Math.PI / 180;
   }
   function angle(degrees, getCoterminals = true) {
     degrees = (degrees % 360 + 360) % 360;
@@ -513,7 +508,7 @@ document.getElementById('start').addEventListener('click', e => {
   if (options.showTime) document.body.classList.add('show-time');
   let html = '';
   problems.forEach(({fn, arg, type, answer}) => {
-    html += `<div class="problem"><span class="answer">${solutionHTMLs[answer]}</span><span><span class="fn">${fn}</span>`;
+    html += `<div class="problem"><span class="answer">${solutionHTMLs[answer] || answer}</span><span><span class="fn">${fn}</span>`;
     if (type === 'degrees') html += arg + '&deg;';
     else if (arg === 0) html += 0;
     else if (arg[1] === 1) html += (arg[0] === 1 ? '' : arg[0]) + '&pi;';
