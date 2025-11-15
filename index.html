@@ -309,6 +309,7 @@ document.getElementById('start').addEventListener('click',()=>{
   renderProblems();
   document.body.classList.remove('show-intro-modal','show-score');
   document.body.classList.add('show-solutions');
+  solutions.removeAttribute('aria-hidden');  // ✅ make buttons visible
   startTime=Date.now(); startClock();
   playing=true;
 });
@@ -316,6 +317,7 @@ document.getElementById('start').addEventListener('click',()=>{
 document.getElementById('menu').addEventListener('click',()=>{
   document.body.classList.remove('show-score','show-solutions');
   document.body.classList.add('show-intro-modal');
+  solutions.setAttribute('aria-hidden', 'true');  // ✅ hide buttons
   problemsWrapper.innerHTML='';
 });
 
