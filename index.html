@@ -497,11 +497,12 @@ function renderProblems() {
   const cur = problemsWrapper.querySelector('.problem.current');
   if (cur) cur.scrollIntoView({block:'center'});
   document.body.style.setProperty('--problem-n', current);
-}
 
   // mark new current
   const next = problemsWrapper.children[current];
   if (next) next.classList.add('current');
+
+}
 
 /* hook up solution buttons */
 solutions.addEventListener('click', e => {
