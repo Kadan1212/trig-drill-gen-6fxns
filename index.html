@@ -420,8 +420,8 @@ function getCot(angle) {
   function angle(degrees, getCoterminals = true) {
     const [sin, cos, tan] = getAnswers(degrees);
     if (getCoterminals && coterminal) {
-      if (degrees !== 360) angle(degrees - 360, false);
-      angle(degrees + 360, false);
+  if (degrees !== 360) angle(degrees - 360, false);
+  if (degrees !== 0) angle(degrees + 360, false);
     }
     if (useDegrees) {
   problems.push({fn: 'sin', arg: degrees, type: 'degrees', answer: formatAnswer(sin)});
