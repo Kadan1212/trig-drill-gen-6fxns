@@ -427,26 +427,31 @@ function getCot(angle) {
     return [numer, denom];
   }
   function angle(degrees, getCoterminals = true) {
+    degrees = (degrees % 360 + 360) % 360;
     const [sin, cos, tan] = getAnswers(degrees);
     if (getCoterminals && coterminal) {
   if (degrees !== 360) angle(degrees - 360, false);
   if (degrees !== 0) angle(degrees + 360, false);
     }
+    let tanVal = (cos === 0) ? 'und' : tan; // optional: can calculate
+    let cotVal = (sin === 0) ? 'und' : reciprocal(tan);
+    let secVal = (cos === 0) ? 'und' : reciprocal(cos);
+    let cscVal = (sin === 0) ? 'und' : reciprocal(sin);
     if (useDegrees) {
   problems.push({fn: 'sin', arg: degrees, type: 'degrees', answer: formatAnswer(sin)});
   problems.push({fn: 'cos', arg: degrees, type: 'degrees', answer: formatAnswer(cos)});
-  problems.push({fn: 'tan', arg: degrees, type: 'degrees', answer: formatAnswer(tan)});
-  problems.push({fn: 'cot', arg: degrees, type: 'degrees', answer: formatAnswer(reciprocal(tan)) });
-  problems.push({fn: 'sec', arg: degrees, type: 'degrees', answer: formatAnswer(reciprocal(cos)) });
-  problems.push({fn: 'csc', arg: degrees, type: 'degrees', answer: formatAnswer(reciprocal(sin)) });
+  problems.push({fn: 'tan', arg: degrees, type: 'degrees', answer: formatAnswer(tanVal)});
+  problems.push({fn: 'cot', arg: degrees, type: 'degrees', answer: formatAnswer(cotVal)});
+  problems.push({fn: 'sec', arg: degrees, type: 'degrees', answer: formatAnswer(secVal)});
+  problems.push({fn: 'csc', arg: degrees, type: 'degrees', answer: formatAnswer(cscVal)});
 }
 if (radians) {
   problems.push({fn: 'sin', arg: toRadians(degrees), type: 'radians', answer: formatAnswer(sin)});
   problems.push({fn: 'cos', arg: toRadians(degrees), type: 'radians', answer: formatAnswer(cos)});
-  problems.push({fn: 'tan', arg: toRadians(degrees), type: 'radians', answer: formatAnswer(tan)});
-  problems.push({fn: 'cot', arg: toRadians(degrees), type: 'radians', answer: formatAnswer(reciprocal(tan)) });
-  problems.push({fn: 'sec', arg: toRadians(degrees), type: 'radians', answer: formatAnswer(reciprocal(cos)) });
-  problems.push({fn: 'csc', arg: toRadians(degrees), type: 'radians', answer: formatAnswer(reciprocal(sin)) });
+  problems.push({fn: 'tan', arg: toRadians(degrees), type: 'radians', answer: formatAnswer(tanVal)});
+  problems.push({fn: 'cot', arg: toRadians(degrees), type: 'radians', answer: formatAnswer(cotVal)});
+  problems.push({fn: 'sec', arg: toRadians(degrees), type: 'radians', answer: formatAnswer(secVal)});
+  problems.push({fn: 'csc', arg: toRadians(degrees), type: 'radians', answer: formatAnswer(cscVal)});
 }
   }
   if (deg90s) {
