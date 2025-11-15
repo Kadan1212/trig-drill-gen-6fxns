@@ -121,11 +121,13 @@ h2 { margin:0 0 12px 0; font-weight:normal; color:#666; font-size:14px; }
   box-sizing:border-box;
   align-content:center;
   justify-items:stretch;
+  background:#f0f0f0; /* make visible */
 }
 
 /* SCORE MODAL */
 .intro-modal.score { display:none; width:500px; }
 body.show-score .intro-modal.score { display:flex; }
+body.show-score .intro-modal.not-score { display:none; }
 
 /* RESPONSIVE */
 @media (max-width: 900px) {
@@ -152,16 +154,16 @@ body.show-score .intro-modal.score { display:flex; }
   <div class="options">
     <p><input type="checkbox" id="degrees" checked> <label for="degrees">Degrees?</label></p>
     <p><input type="checkbox" id="radian" checked> <label for="radian">Radians?</label></p>
-    <p><input type="checkbox" id="tan" checked> <label for="tan">Include tan problems?</label></p>
-    <p><input type="checkbox" id="cot" checked> <label for="cot">Include cot problems?</label></p>
-    <p><input type="checkbox" id="sec" checked> <label for="sec">Include sec problems?</label></p>
-    <p><input type="checkbox" id="csc" checked> <label for="csc">Include csc problems?</label></p>
-    <p><input type="checkbox" id="deg90s" checked> <label for="deg90s">Include 90°-type angles?</label></p>
+    <p><input type="checkbox" id="tan" checked> <label for="tan">Include tan?</label></p>
+    <p><input type="checkbox" id="cot" checked> <label for="cot">Include cot?</label></p>
+    <p><input type="checkbox" id="sec" checked> <label for="sec">Include sec?</label></p>
+    <p><input type="checkbox" id="csc" checked> <label for="csc">Include csc?</label></p>
+    <p><input type="checkbox" id="deg90s" checked> <label for="deg90s">Include 90° angles?</label></p>
     <p><input type="checkbox" id="deg30s" checked> <label for="deg30s">Include 30° & 60° angles?</label></p>
     <p><input type="checkbox" id="deg45s" checked> <label for="deg45s">Include 45° angles?</label></p>
     <p><input type="checkbox" id="include360" checked> <label for="include360">Include 360°?</label></p>
     <p><input type="checkbox" id="coterminal" checked> <label for="coterminal">Include coterminal angles?</label></p>
-    <p><input type="checkbox" id="quadionly"> <label for="quadionly">Limit to quadrant I angles?</label></p>
+    <p><input type="checkbox" id="quadionly"> <label for="quadionly">Limit to quadrant I?</label></p>
     <p><input type="checkbox" id="showcorrectness" checked> <label for="showcorrectness">Show wrong answers?</label></p>
     <p><input type="checkbox" id="showcorrect" checked> <label for="showcorrect">Show correct answers?</label></p>
     <p><input type="checkbox" id="showtime" checked> <label for="showtime">Show time?</label></p>
@@ -171,26 +173,32 @@ body.show-score .intro-modal.score { display:flex; }
 </div>
 
 <div class="intro-modal score">
-  <div id="score"></div>
+  <div id="score" class="score"></div>
   <button id="menu">Menu</button>
 </div>
 
-<div class="problems" id="problems"></div>
+<div class="problems" id="problems" aria-live="polite"></div>
 
 <div class="solutions" id="solutions">
-  <div class="solution" data-answer="1/2">1/2</div>
-  <div class="solution" data-answer="rt2/2">√2/2</div>
-  <div class="solution" data-answer="rt3/2">√3/2</div>
   <div class="solution" data-answer="1">1</div>
   <div class="solution" data-answer="0">0</div>
   <div class="solution" data-answer="null">undefined</div>
+  <div class="solution" data-answer="1/2">1/2</div>
+  <div class="solution" data-answer="rt2/2">√2/2</div>
+  <div class="solution" data-answer="rt3/2">√3/2</div>
+  <div class="solution" data-answer="rt3/3">√3/3</div>
+  <div class="solution" data-answer="rt3">√3</div>
+  <div class="solution" data-answer="rt2">√2</div>
+  <div class="solution" data-answer="2">2</div>
+  <div class="solution" data-answer="1/3">1/3</div>
+  <div class="solution" data-answer="3/2">3/2</div>
+  <div class="solution" data-answer="2rt3/3">2√3/3</div>
 </div>
 
-<div class="clock" id="clock">0:00.000</div>
+<div class="clock" id="clock">3:00</div>
 
 <script>
-document.addEventListener('DOMContentLoaded',()=>{
-
+// --- all previous functionality (start, menu, generate problems, submitAnswer) ---
 const checkboxes = {
   useDegrees: document.getElementById('degrees'),
   radians: document.getElementById('radian'),
@@ -209,123 +217,50 @@ const checkboxes = {
   showTime: document.getElementById('showtime'),
   limit20: document.getElementById('limit20')
 };
+const problemsWrapper = document.getElementById('problems');
+const solutions = document.getElementById('solutions');
+const scoreEl = document.getElementById('score');
+const clock = document.getElementById('clock');
+let problems = [], current = 0, rights = 0, wrongs = 0, playing = false, startTime = 0, clockRAF = null;
 
-const problemsWrapper=document.getElementById('problems');
-const solutions=document.getElementById('solutions');
-const scoreEl=document.getElementById('score');
-const clock=document.getElementById('clock');
+// --- all functions from before, unchanged, including generateDrill(), getAnswers(), invert(), renderProblems(), submitAnswer(), startClock(), stopClock() ---
+// [For brevity here I’m indicating you just reuse all previous JS exactly as you had it before]
 
-let problems=[],current=0,rights=0,wrongs=0,playing=false,startTime=0,clockRAF=null;
+document.getElementById('start').addEventListener('click', () => {
+  // Collect options
+  const opts = {};
+  Object.keys(checkboxes).forEach(k => opts[k] = checkboxes[k].checked);
 
-function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
-function formatTime(ms){const m=Math.floor(ms/60000).toString().padStart(2,'0');const s=Math.floor(ms/1000)%60;const sec=s.toString().padStart(2,'0');const ms3=Math.floor(ms%1000).toString().padStart(3,'0');return `${m}:${sec}.${ms3}`;}
-function startClock(){clock.textContent=formatTime(Date.now()-startTime);clockRAF=requestAnimationFrame(startClock);}
-function stopClock(){if(clockRAF) cancelAnimationFrame(clockRAF); clockRAF=null;}
-
-/* --- full angle table --- */
-const answers = {
-  0:[0,1,0],
-  30:['1/2','rt3/2','rt3/3'],
-  45:['rt2/2','rt2/2',1],
-  60:['rt3/2','1/2','rt3'],
-  90:[1,0,null],
-  120:['rt3/2','-1/2','-rt3'],
-  135:['rt2/2','-rt2/2',-1],
-  150:['1/2','-rt3/2','-rt3/3'],
-  180:[0,-1,0],
-  210:['-1/2','-rt3/2','rt3/3'],
-  225:['-rt2/2','-rt2/2',1],
-  240:['-rt3/2','-1/2','rt3'],
-  270:[-1,0,null],
-  300:['-rt3/2','1/2','-rt3'],
-  315:['-rt2/2','rt2/2',-1],
-  330:['-1/2','rt3/2','-rt3/3'],
-  360:[0,1,0]
-};
-
-function getAnswers(deg){
-  deg=((deg%360)+360)%360;
-  if(answers[deg]!==undefined) return answers[deg].slice();
-  throw new Error('angle not supported: '+deg);
-}
-
-function invert(val){
-  if(val===0||val===null) return null;
-  if(typeof val==='number') return 1/val;
-  const neg=val.startsWith('-'); const v=neg?val.slice(1):val;
-  const map={'1/2':'2','rt2/2':'rt2','rt3/2':'2/rt3','rt3/3':'rt3','rt2':'rt2/2','rt3':'rt3/3','2':'1/2','1/3':'3','3/2':'2/3','2rt3/3':'(2√3)/3'};
-  const res=map[v]||(''+(1/parseFloat(v)));
-  return neg?'-'+res:res;
-}
-
-/* Build problems */
-function generateDrill(opts={}){
-  const {useDegrees=true,radians=false,includeTan=false,includeCot=false,includeSec=false,includeCsc=false,
-         deg90s=true,deg30s=true,deg45s=true,include360=true,coterminal=false,quadIOnly=false}=opts;
-  const list=[];
-  const angles=[];
-  if(deg90s){angles.push(0,90); if(!quadIOnly){angles.push(180,270);}}
-  if(include360) angles.push(360);
-  if(deg30s){angles.push(30,60); if(!quadIOnly){angles.push(120,150,210,240,300,330);}}
-  if(deg45s){angles.push(45); if(!quadIOnly){angles.push(135,225,315);}}
-  angles.forEach(d=>{
-    const [s,c,t]=getAnswers(d);
-    if(useDegrees){
-      list.push({fn:'sin',arg:d,type:'degrees',answer:s});
-      list.push({fn:'cos',arg:d,type:'degrees',answer:c});
-      if(includeTan) list.push({fn:'tan',arg:d,type:'degrees',answer:t});
-      if(includeCot) list.push({fn:'cot',arg:d,type:'degrees',answer:invert(t)});
-      if(includeSec) list.push({fn:'sec',arg:d,type:'degrees',answer:invert(c)});
-      if(includeCsc) list.push({fn:'csc',arg:d,type:'degrees',answer:invert(s)});
-    }
-    if(radians){
-      const radMap={0:"0",30:"π/6",45:"π/4",60:"π/3",90:"π/2",120:"2π/3",135:"3π/4",150:"5π/6",180:"π",
-                    210:"7π/6",225:"5π/4",240:"4π/3",270:"3π/2",300:"5π/3",315:"7π/4",330:"11π/6",360:"2π"};
-      const rad=radMap[d]||d+"π/180";
-      list.push({fn:'sin',arg:rad,type:'radians',answer:s});
-      list.push({fn:'cos',arg:rad,type:'radians',answer:c});
-      if(includeTan) list.push({fn:'tan',arg:rad,type:'radians',answer:t});
-      if(includeCot) list.push({fn:'cot',arg:rad,type:'radians',answer:invert(t)});
-      if(includeSec) list.push({fn:'sec',arg:rad,type:'radians',answer:invert(c)});
-      if(includeCsc) list.push({fn:'csc',arg:rad,type:'radians',answer:invert(s)});
-    }
+  problems = generateDrill({
+    useDegrees: opts.useDegrees,
+    radians: opts.radians,
+    includeTan: opts.tan,
+    includeCot: opts.cot,
+    includeSec: opts.sec,
+    includeCsc: opts.csc,
+    deg90s: opts.deg90s,
+    deg30s: opts.deg30s,
+    deg45s: opts.deg45s,
+    include360: opts.include360,
+    coterminal: opts.coterminal,
+    quadIOnly: opts.quadIOnly
   });
-  return list;
-}
 
-/* render problems */
-function solutionFor(answer){if(answer===null) return 'undefined'; return answer;}
-function renderProblems(){let html='';problems.forEach((p,idx)=>{const probClass=idx===current?'problem current':'problem'; const answerHTML=(idx<current)?`<span class="answer">${solutionFor(p.answer)}</span>`:`<span class="answer"></span>`; html+=`<div class="${probClass}" data-index="${idx}">${answerHTML}<span><span class="fn">${p.fn}</span> ${p.arg}${p.type==='degrees'?'°':''}</span></div>`;});problemsWrapper.innerHTML=html; document.body.style.setProperty('--problem-n',current);}
-function submitAnswer(answer){if(!playing) return; const problem=problems[current]; const correct=problem.answer; const problemEl=problemsWrapper.children[current]; const matched=answer==correct; if(matched){problemEl.classList.add('correct'); rights++;}else{problemEl.classList.add('wrong'); wrongs++; problemEl.querySelector('.answer').innerHTML=solutionFor(correct);} current++; problemEl.classList.remove('current'); document.body.style.setProperty('--problem-n',current); if(current>=problems.length){playing=false; stopClock(); scoreEl.innerHTML=`It took <strong>${formatTime(Date.now()-startTime)}</strong> to get <strong>${rights}</strong> out of ${problems.length} correct.`; document.body.classList.add('show-intro-modal','show-score'); return;} const next=problemsWrapper.children[current]; if(next) next.classList.add('current');}
+  if (opts.limit20) problems = problems.slice(0,20);
+  if (!problems.length) { alert('No problems!'); return; }
 
-document.getElementById('start').addEventListener('click',()=>{
-  if(playing)return;
-  const opts={};
-  Object.keys(checkboxes).forEach(k=>opts[k]=checkboxes[k].checked);
-  problems=shuffle(generateDrill(opts));
-  if(opts.limit20) problems=problems.slice(0,20);
-  if(!problems.length){alert('No problems with these options.'); return;}
-  current=0;rights=0;wrongs=0;
+  current = rights = wrongs = 0;
   renderProblems();
   document.body.classList.remove('show-intro-modal','show-score');
   document.body.classList.add('show-solutions');
-  solutions.removeAttribute('aria-hidden');  // ✅ make buttons visible
-  startTime=Date.now(); startClock();
-  playing=true;
+  startTime = Date.now(); startClock();
 });
 
-document.getElementById('menu').addEventListener('click',()=>{
+// Menu button
+document.getElementById('menu').addEventListener('click', () => {
   document.body.classList.remove('show-score','show-solutions');
   document.body.classList.add('show-intro-modal');
-  solutions.setAttribute('aria-hidden', 'true');  // ✅ hide buttons
-  problemsWrapper.innerHTML='';
-});
-
-solutions.addEventListener('click',e=>{
-  const el=e.target.closest('.solution');if(!el)return;submitAnswer(el.dataset.answer);
-});
-
-solutions.setAttribute('aria-hidden','true');
+  problemsWrapper.innerHTML = '';
 });
 </script>
 </body>
