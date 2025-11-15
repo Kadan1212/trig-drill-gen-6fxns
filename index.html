@@ -371,19 +371,39 @@ function getCot(angle) {
   return reciprocal(answers[angle][2]); // 1/tan
 }
   
-  function getAnswers(degrees) {
-    degrees = (degrees % 360 + 360) % 360;
-    if (answers[degrees]) return answers[degrees].slice(); // QUADRANT I
-    if (degrees === 180) {
-      const t = answers[0].slice();
-      t[1] = -1;
-      return t;
-    }
-    if (degrees === 270) {
-      const t = answers[90].slice();
-      t[0] = -1;
-      return t;
-    }
+  // Exact fraction table for common angles in degrees
+const exactValues = {
+  0:   [0, 1, 0],
+  30:  ['1/2', 'rt3/2', 'rt3/3'],
+  45:  ['rt2/2', 'rt2/2', 1],
+  60:  ['rt3/2', '1/2', 'rt3'],
+  90:  [1, 0, 'und'],
+  180: [0, -1, 0],
+  270: [-1, 0, 'und'],
+  360: [0, 1, 0]
+};
+
+function getAnswers(degrees) {
+  // Normalize angle to [0, 360)
+  degrees = ((degrees % 360) + 360) % 360;
+
+  // Return exact values if available
+  if (exactValues[degrees] !== undefined) return exactValues[degrees].slice();
+
+  // Otherwise, calculate numerically
+  const rad = degrees * Math.PI / 180;
+  const sin = Math.sin(rad);
+  const cos = Math.cos(rad);
+  let tan = cos === 0 ? 'und' : Math.tan(rad);
+
+  // Round numeric answers to 3 decimals
+  function roundOrUnd(val) {
+    if (val === 'und') return 'und';
+    return Math.round(val * 1000) / 1000;
+  }
+
+  return [roundOrUnd(sin), roundOrUnd(cos), roundOrUnd(tan)];
+}
     // QUADRANT II
     if (degrees > 90 && degrees < 180) {
       const t = answers[180 - degrees].slice();
