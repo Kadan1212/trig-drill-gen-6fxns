@@ -550,8 +550,6 @@ solutions.addEventListener('click', e => {
 });
 function submitAnswer(answer) {
   if (!playing) return;
-  if (answer === '0' || answer === '1' || answer === '-1') answer = +answer;
-  else if (answer === 'null') answer = null;
   if (answer === problems[problem].answer) {
     problemsWrapper.children[problem].classList.add('correct');
     rights++;
