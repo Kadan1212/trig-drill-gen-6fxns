@@ -331,25 +331,23 @@ function formatAnswer(value) {
 function reciprocal(value) {
   if (value === 0 || value === '0' || value === null || value === undefined) return 'und';
 
+  const mapping = {
+    '1/2': '2',
+    'rt2/2': '2rt2/2',
+    'rt3/2': '2rt3/3',
+    'rt3/3': 'rt3',
+    '1': '1'
+  };
+
   let negative = false;
   if (typeof value === 'string' && value.startsWith('-')) {
     negative = true;
     value = value.slice(1);
   }
 
-  let result;
-  switch (value) {
-    case '1/2': result = '2'; break;
-    case 'rt2/2': result = '2rt2/2'; break;
-    case 'rt3/2': result = '2rt3/3'; break;
-    case 'rt3/3': result = '3/rt3'; break;
-    case '1': result = '1'; break;
-    default: result = 'und';
-  }
-
-  if (negative && result !== 'und') result = '-' + result; // THIS MUST BE INSIDE FUNCTION
-
-  return result; // RETURN INSIDE FUNCTION
+  let result = mapping[value] || 'und';
+  if (negative && result !== 'und') result = '-' + result;
+  return result;
 }
   
 function getCsc(angle) {
