@@ -302,6 +302,13 @@
     <div class="clock" id="clock">3:00</div>
     <script>
 function generateDrill({
+  function formatAnswer(value) {
+  if (value === 0) return '0';
+  if (value === 1) return '1';
+  if (value === -1) return '-1';
+  if (value === null || value === undefined) return 'und';
+  return value.toString(); // fractions like '1/2', 'rt2/2' remain unchanged
+}
   useDegrees = true,
   radians = false,
   tan: includeTan = false,
