@@ -335,6 +335,7 @@ function reciprocal(value) {
         '-rt3/3': '-rt3',
         '1': '1',
         '-1': '-1'
+    '0': 'und'
 };
 
   let negative = false;
@@ -349,13 +350,13 @@ function reciprocal(value) {
 }
   
 function getCsc(angle) {
-  return reciprocal(answers[angle][0]); // 1/sin
+  return reciprocal(getAnswers[angle][0]); // 1/sin
 }
 function getSec(angle) {
-  return reciprocal(answers[angle][1]); // 1/cos
+  return reciprocal(getAnswers[angle][1]); // 1/cos
 }
 function getCot(angle) {
-  return reciprocal(answers[angle][2]); // 1/tan
+  return reciprocal(getAnswers[angle][2]); // 1/tan
 }
   
   // Exact fraction table for common angles in degrees
