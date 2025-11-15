@@ -314,12 +314,24 @@ function generateDrill({
   quadIOnly = false
 } = {}) {
   const answers = {
-    0: [0, 1, 0],
-    30: ['1/2', 'rt3/2', 'rt3/3'],
-    45: ['rt2/2', 'rt2/2', 1],
-    60: ['rt3/2', '1/2', 'rt3'],
-    90: [1, 0, null]
-  };
+  0:   {sin:'0', cos:'1', tan:'0'},
+  30:  {sin:'1/2', cos:'rt3/2', tan:'rt3/3'},
+  45:  {sin:'rt2/2', cos:'rt2/2', tan:'1'},
+  60:  {sin:'rt3/2', cos:'1/2', tan:'rt3'},
+  90:  {sin:'1', cos:'0', tan:'undefined'},
+  120: {sin:'rt3/2', cos:'-1/2', tan:'-rt3'},
+  135: {sin:'rt2/2', cos:'-rt2/2', tan:'-1'},
+  150: {sin:'1/2', cos:'-rt3/2', tan:'-rt3/3'},
+  180: {sin:'0', cos:'-1', tan:'0'},
+  210: {sin:'-1/2', cos:'-rt3/2', tan:'1/3'}, // etc
+  225: {sin:'-rt2/2', cos:'-rt2/2', tan:'1'},
+  240: {sin:'-rt3/2', cos:'-1/2', tan:'rt3'},
+  270: {sin:'-1', cos:'0', tan:'undefined'},
+  300: {sin:'-rt3/2', cos:'1/2', tan:'-rt3'},
+  315: {sin:'-rt2/2', cos:'rt2/2', tan:'-1'},
+  330: {sin:'-1/2', cos:'rt3/2', tan:'-rt3/3'},
+  360: {sin:'0', cos:'1', tan:'0'}
+};
   function getAnswers(degrees) {
     degrees = (degrees % 360 + 360) % 360;
     if (answers[degrees]) return answers[degrees].slice(); // QUADRANT I
