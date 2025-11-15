@@ -30,7 +30,7 @@ html,body {
 }
 
 /* CONTAINER STATES */
-body.show-intro-modal .intro-modal.not-score { display:flex; }
+body.show-intro-modal .intro-modal { display:flex; }
 body.show-intro-modal .solutions { display:none; }
 body.show-solutions .solutions { display:grid; }
 body.show-intro-modal .problems { display:none; }
@@ -121,7 +121,6 @@ h2 { margin:0 0 12px 0; font-weight:normal; color:#666; font-size:14px; }
   box-sizing:border-box;
   align-content:center;
   justify-items:stretch;
-  background:#f0f0f0; /* make visible */
 }
 
 /* SCORE MODAL */
@@ -148,120 +147,218 @@ body.show-score .intro-modal.not-score { display:none; }
 </head>
 <body class="show-intro-modal">
 
-<div class="intro-modal not-score">
-  <h1>Trig Drill Generator</h1>
-  <h2>Options</h2>
-  <div class="options">
-    <p><input type="checkbox" id="degrees" checked> <label for="degrees">Degrees?</label></p>
-    <p><input type="checkbox" id="radian" checked> <label for="radian">Radians?</label></p>
-    <p><input type="checkbox" id="tan" checked> <label for="tan">Include tan?</label></p>
-    <p><input type="checkbox" id="cot" checked> <label for="cot">Include cot?</label></p>
-    <p><input type="checkbox" id="sec" checked> <label for="sec">Include sec?</label></p>
-    <p><input type="checkbox" id="csc" checked> <label for="csc">Include csc?</label></p>
-    <p><input type="checkbox" id="deg90s" checked> <label for="deg90s">Include 90° angles?</label></p>
-    <p><input type="checkbox" id="deg30s" checked> <label for="deg30s">Include 30° & 60° angles?</label></p>
-    <p><input type="checkbox" id="deg45s" checked> <label for="deg45s">Include 45° angles?</label></p>
-    <p><input type="checkbox" id="include360" checked> <label for="include360">Include 360°?</label></p>
-    <p><input type="checkbox" id="coterminal" checked> <label for="coterminal">Include coterminal angles?</label></p>
-    <p><input type="checkbox" id="quadionly"> <label for="quadionly">Limit to quadrant I?</label></p>
-    <p><input type="checkbox" id="showcorrectness" checked> <label for="showcorrectness">Show wrong answers?</label></p>
-    <p><input type="checkbox" id="showcorrect" checked> <label for="showcorrect">Show correct answers?</label></p>
-    <p><input type="checkbox" id="showtime" checked> <label for="showtime">Show time?</label></p>
-    <p><input type="checkbox" id="limit20"> <label for="limit20">Limit to twenty problems?</label></p>
+  <!-- intro (options) -->
+  <div class="intro-modal not-score">
+    <h1>Trig Drill Generator</h1>
+    <h2>Options</h2>
+    <div class="options">
+      <p><input type="checkbox" id="degrees" checked> <label for="degrees">Degrees?</label></p>
+      <p><input type="checkbox" id="radian" checked> <label for="radian">Radians?</label></p>
+      <p><input type="checkbox" id="sin" checked> <label for="sin">Include sin problems?</label></p>
+      <p><input type="checkbox" id="cos" checked> <label for="cos">Include cos problems?</label></p>
+      <p><input type="checkbox" id="tan" checked> <label for="tan">Include tan problems?</label></p>
+      <p><input type="checkbox" id="cot" checked> <label for="cot">Include cot problems?</label></p>
+      <p><input type="checkbox" id="sec" checked> <label for="sec">Include sec problems?</label></p>
+      <p><input type="checkbox" id="csc" checked> <label for="csc">Include csc problems?</label></p>
+
+      <p><input type="checkbox" id="deg90s" checked> <label for="deg90s">Include 90°-type angles?</label></p>
+      <p><input type="checkbox" id="deg30s" checked> <label for="deg30s">Include 30° & 60° angles?</label></p>
+      <p><input type="checkbox" id="deg45s" checked> <label for="deg45s">Include 45° angles?</label></p>
+      <p><input type="checkbox" id="include360" checked> <label for="include360">Include 360°?</label></p>
+      <p><input type="checkbox" id="coterminal" checked> <label for="coterminal">Include coterminal angles?</label></p>
+      <p><input type="checkbox" id="quadionly"> <label for="quadionly">Limit to quadrant I angles?</label></p>
+      <p><input type="checkbox" id="showcorrectness" checked> <label for="showcorrectness">Show wrong answers?</label></p>
+      <p><input type="checkbox" id="showcorrect" checked> <label for="showcorrect">Show correct answers?</label></p>
+      <p><input type="checkbox" id="showtime" checked> <label for="showtime">Show time?</label></p>
+      <p><input type="checkbox" id="limit20"> <label for="limit20">Limit to twenty problems?</label></p>
+    </div>
+    <button id="start">Start</button>
   </div>
-  <button id="start">Start</button>
-</div>
 
-<div class="intro-modal score">
-  <div id="score" class="score"></div>
-  <button id="menu">Menu</button>
-</div>
+  <!-- score modal (only shown at end) -->
+  <div class="intro-modal score">
+    <div id="score" class="score"></div>
+    <button id="menu">Menu</button>
+  </div>
 
-<div class="problems" id="problems" aria-live="polite"></div>
+  <!-- problems column (center) -->
+  <div class="problems" id="problems" aria-live="polite"></div>
 
+<!-- SOLUTIONS BUTTONS -->
 <div class="solutions" id="solutions">
-  <div class="solution" data-answer="1">1</div>
-  <div class="solution" data-answer="0">0</div>
-  <div class="solution" data-answer="null">undefined</div>
   <div class="solution" data-answer="1/2">1/2</div>
   <div class="solution" data-answer="rt2/2">√2/2</div>
   <div class="solution" data-answer="rt3/2">√3/2</div>
+  <div class="solution" data-answer="1">1</div>
+  <div class="solution" data-answer="0">0</div>
+  <div class="solution" data-answer="null">undefined</div>
   <div class="solution" data-answer="rt3/3">√3/3</div>
   <div class="solution" data-answer="rt3">√3</div>
   <div class="solution" data-answer="rt2">√2</div>
-  <div class="solution" data-answer="2">2</div>
+  <div class="solution" data-answer="(2rt3)/3">(2√3)/3</div>
   <div class="solution" data-answer="1/3">1/3</div>
   <div class="solution" data-answer="3/2">3/2</div>
-  <div class="solution" data-answer="2rt3/3">2√3/3</div>
 </div>
 
-<div class="clock" id="clock">3:00</div>
+<div class="clock" id="clock">0:00</div>
 
 <script>
-// --- all previous functionality (start, menu, generate problems, submitAnswer) ---
-const checkboxes = {
-  useDegrees: document.getElementById('degrees'),
-  radians: document.getElementById('radian'),
-  tan: document.getElementById('tan'),
-  cot: document.getElementById('cot'),
-  sec: document.getElementById('sec'),
-  csc: document.getElementById('csc'),
-  deg90s: document.getElementById('deg90s'),
-  deg30s: document.getElementById('deg30s'),
-  deg45s: document.getElementById('deg45s'),
-  include360: document.getElementById('include360'),
-  coterminal: document.getElementById('coterminal'),
-  quadIOnly: document.getElementById('quadionly'),
-  showCorrectness: document.getElementById('showcorrectness'),
-  showCorrect: document.getElementById('showcorrect'),
-  showTime: document.getElementById('showtime'),
-  limit20: document.getElementById('limit20')
+// ---------- CORE FUNCTIONS ----------
+function invert(value){
+  if(value===0) return null;
+  if(value===null) return 0;
+  if(typeof value==='number') return 1/value;
+  const neg=(''+value).startsWith('-');
+  const v=neg?value.slice(1):value;
+  const map={'1/2':'2','rt2/2':'rt2','rt3/2':'2/rt3','rt3/3':'rt3','rt2':'rt2/2','rt3':'rt3/3','2':'1/2','1/3':'3','3/2':'2/3','2rt3/3':'(2√3)/3'};
+  const res=map[v]||(1/parseFloat(v));
+  return neg?'-'+res:res;
+}
+
+const answers={0:[0,1,0],30:['1/2','rt3/2','rt3/3'],45:['rt2/2','rt2/2',1],60:['rt3/2','1/2','rt3'],90:[1,0,null],120:['rt3/2','-1/2','-rt3'],135:['rt2/2','-rt2/2',-1],150:['1/2','-rt3/2','-rt3/3'],180:[0,-1,0],210:['-1/2','-rt3/2','rt3/3'],225:['-rt2/2','-rt2/2',1],240:['-rt3/2','-1/2','rt3'],270:[-1,0,null],300:['-rt3/2','1/2','-rt3'],315:['-rt2/2','rt2/2',-1],330:['-1/2','rt3/2','-rt3/3'],360:[0,1,0]};
+function getAnswers(deg){
+  deg=((deg%360)+360)%360;
+  if(answers[deg]!==undefined) return answers[deg].slice();
+  function invertSign(x){if(x===null)return null;if(typeof x==='number')return -x;if(typeof x==='string')return x.startsWith('-')?x.slice(1):'-'+x;return x;}
+  if(deg>0&&deg<90)return answers[deg].slice();
+  if(deg>90&&deg<180){let t=answers[180-deg].slice();t[0]=invertSign(t[0]);t[1]=invertSign(t[1]);t[2]=invertSign(t[2]);return t;}
+  if(deg>180&&deg<270){let t=answers[deg-180].slice();t[0]=invertSign(t[0]);t[1]=invertSign(t[1]);t[2]=invertSign(t[2]);return t;}
+  if(deg>270&&deg<360){let t=answers[360-deg].slice();t[0]=invertSign(t[0]);t[1]=invertSign(t[1]);t[2]=invertSign(t[2]);return t;}
+  return [0,1,0];
+}
+
+function generateDrill(opts={}){
+  const {useDegrees=true,radians=false,includeTan=false,includeCot=false,includeSec=false,includeCsc=false,deg90s=true,deg30s=true,deg45s=true,include360=true,coterminal=false,quadIOnly=false}=opts;
+  const problems=[];
+  function addAngle(deg,includeCoterminals=true){
+    const [sin,cos,tan]=getAnswers(deg);
+    if(includeCoterminals&&coterminal){if(deg!==360)addAngle(deg-360,false);addAngle(deg+360,false);}
+    if(useDegrees){
+      if(opts.sin) problems.push({fn:'sin',arg:deg,type:'degrees',answer:sin});
+      if(opts.cos) problems.push({fn:'cos',arg:deg,type:'degrees',answer:cos});
+      if(includeTan) problems.push({fn:'tan',arg:deg,type:'degrees',answer:tan});
+      if(includeCot) problems.push({fn:'cot',arg:deg,type:'degrees',answer:invert(tan)});
+      if(includeSec) problems.push({fn:'sec',arg:deg,type:'degrees',answer:invert(cos)});
+      if(includeCsc) problems.push({fn:'csc',arg:deg,type:'degrees',answer:invert(sin)});
+    }
+    if(radians){
+      function toRad(d){d=((d%360)+360)%360;const map={0:"0",30:"π/6",45:"π/4",60:"π/3",90:"π/2",120:"2π/3",135:"3π/4",150:"5π/6",180:"π",210:"7π/6",225:"5π/4",240:"4π/3",270:"3π/2",300:"5π/3",315:"7π/4",330:"11π/6",360:"2π"};return map[d]||(d/180)+"π";}
+      const rad=toRad(deg);
+      if(opts.sin) problems.push({fn:'sin',arg:rad,type:'radians',answer:sin});
+      if(opts.cos) problems.push({fn:'cos',arg:rad,type:'radians',answer:cos});
+      if(includeTan) problems.push({fn:'tan',arg:rad,type:'radians',answer:tan});
+      if(includeCot) problems.push({fn:'cot',arg:rad,type:'radians',answer:invert(tan)});
+      if(includeSec) problems.push({fn:'sec',arg:rad,type:'radians',answer:invert(cos)});
+      if(includeCsc) problems.push({fn:'csc',arg:rad,type:'radians',answer:invert(sin)});
+    }
+  }
+  if(deg90s){addAngle(0);addAngle(90);if(!quadIOnly){addAngle(180);addAngle(270);}}
+  if(include360) addAngle(360);
+  if(deg30s){addAngle(30);addAngle(60);if(!quadIOnly){addAngle(120);addAngle(150);addAngle(210);addAngle(240);addAngle(300);addAngle(330);}}
+  if(deg45s){addAngle(45);if(!quadIOnly){addAngle(135);addAngle(225);addAngle(315);}}
+  return problems;
+}
+
+// ---------- UI ----------
+const checkboxes={
+  useDegrees:document.getElementById('degrees'),
+  radians:document.getElementById('radian'),
+  sin:document.getElementById('sin'),
+  cos:document.getElementById('cos'),
+  tan:document.getElementById('tan'),
+  cot:document.getElementById('cot'),
+  sec:document.getElementById('sec'),
+  csc:document.getElementById('csc'),
+  deg90s:document.getElementById('deg90s'),
+  deg30s:document.getElementById('deg30s'),
+  deg45s:document.getElementById('deg45s'),
+  include360:document.getElementById('include360'),
+  coterminal:document.getElementById('coterminal'),
+  quadIOnly:document.getElementById('quadionly'),
+  showCorrectness:document.getElementById('showcorrectness'),
+  showCorrect:document.getElementById('showcorrect'),
+  showTime:document.getElementById('showtime'),
+  limit20:document.getElementById('limit20')
 };
-const problemsWrapper = document.getElementById('problems');
-const solutions = document.getElementById('solutions');
-const scoreEl = document.getElementById('score');
-const clock = document.getElementById('clock');
-let problems = [], current = 0, rights = 0, wrongs = 0, playing = false, startTime = 0, clockRAF = null;
+const problemsWrapper=document.getElementById('problems');
+const solutions=document.getElementById('solutions');
+const scoreEl=document.getElementById('score');
+const clock=document.getElementById('clock');
 
-// --- all functions from before, unchanged, including generateDrill(), getAnswers(), invert(), renderProblems(), submitAnswer(), startClock(), stopClock() ---
-// [For brevity here I’m indicating you just reuse all previous JS exactly as you had it before]
+let problems=[],current=0,rights=0,wrongs=0,playing=false,startTime=0,clockRAF=null;
 
-document.getElementById('start').addEventListener('click', () => {
-  // Collect options
-  const opts = {};
-  Object.keys(checkboxes).forEach(k => opts[k] = checkboxes[k].checked);
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
 
-  problems = generateDrill({
-    useDegrees: opts.useDegrees,
-    radians: opts.radians,
-    includeTan: opts.tan,
-    includeCot: opts.cot,
-    includeSec: opts.sec,
-    includeCsc: opts.csc,
-    deg90s: opts.deg90s,
-    deg30s: opts.deg30s,
-    deg45s: opts.deg45s,
-    include360: opts.include360,
-    coterminal: opts.coterminal,
-    quadIOnly: opts.quadIOnly
+const solutionHTMLs={};
+Array.from(solutions.children).forEach(el=>solutionHTMLs[el.dataset.answer]=el.innerHTML);
+
+function solutionFor(answer){if(answer===null)return '<span class="small">undefined</span>';if(answer===0||answer===1||answer===-1)return String(answer);if(solutionHTMLs[answer])return solutionHTMLs[answer];return (''+answer).replace(/rt/g,'√');}
+
+function formatTime(ms){const m=Math.floor(ms/60000).toString().padStart(2,'0');const s=Math.floor(ms/1000)%60;const sec=s.toString().padStart(2,'0');return `${m}:${sec}`;}
+
+function renderProblems(){
+  problemsWrapper.innerHTML='';
+  problems.forEach((p,i)=>{
+    const div=document.createElement('div');
+    div.className='problem'+(i===current?' current':'');
+    div.innerHTML=`<div class="answer">${solutionFor(p.answer)}</div>${p.fn}(${p.arg})`;
+    problemsWrapper.appendChild(div);
   });
+}
 
-  if (opts.limit20) problems = problems.slice(0,20);
-  if (!problems.length) { alert('No problems!'); return; }
-
-  current = rights = wrongs = 0;
+function nextProblem(){
+  current++;
+  if(current>=problems.length){
+    endGame();
+    return;
+  }
   renderProblems();
-  document.body.classList.remove('show-intro-modal','show-score');
+}
+
+function startClock(){startTime=Date.now();function tick(){clock.textContent=formatTime(Date.now()-startTime);clockRAF=requestAnimationFrame(tick);}tick();}
+function stopClock(){if(clockRAF) cancelAnimationFrame(clockRAF);}
+
+function startGame(){
+  const opts={};
+  for(const k in checkboxes) opts[k]=checkboxes[k].checked;
+  problems=generateDrill(opts);
+  if(opts.limit20) problems=problems.slice(0,20);
+  problems=shuffle(problems);
+  current=0;rights=0;wrongs=0;
+  document.body.classList.remove('show-intro-modal','show-score'); 
   document.body.classList.add('show-solutions');
-  startTime = Date.now(); startClock();
+  renderProblems();
+  startClock();
+  playing=true;
+}
+
+// handle clicking solution buttons
+Array.from(solutions.children).forEach(el=>{
+  el.addEventListener('click',()=>{
+    if(!playing) return;
+    const p=problems[current];
+    if(p.answer==el.dataset.answer){
+      problems[current].correct=true;
+      rights++;
+    } else {
+      problems[current].wrong=true;
+      wrongs++;
+    }
+    nextProblem();
+  });
 });
 
-// Menu button
-document.getElementById('menu').addEventListener('click', () => {
-  document.body.classList.remove('show-score','show-solutions');
-  document.body.classList.add('show-intro-modal');
-  problemsWrapper.innerHTML = '';
-});
+function endGame(){
+  playing=false;
+  stopClock();
+  scoreEl.textContent=`You got ${rights} correct and ${wrongs} wrong in ${clock.textContent}.`;
+  document.body.classList.remove('show-solutions');
+  document.body.classList.add('show-score');
+}
+
+// start/menu buttons
+document.getElementById('start').addEventListener('click',startGame);
+document.getElementById('menu').addEventListener('click',()=>document.body.classList.add('show-intro-modal'));
 </script>
 </body>
 </html>
