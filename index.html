@@ -321,18 +321,28 @@ function generateDrill({
 };
 
   function reciprocal(value) {
-  if (value === 0 || value === '0' || value === null) return 'undefined';
-  if (typeof value === 'number') return 1 / value;
-  // keep fraction strings as-is for the buttons
-  switch(value) {
-    case '1/2': return '2';
-    case 'rt2/2': return '2rt2/2'; // adjust if you want simplified
-    case 'rt3/2': return '2rt3/3';
-    case 'rt3/3': return '3/rt3'; // or leave as-is
-    case '1': return '1';
+  if (value === 0 || value === '0' || value === null || value === undefined) return 'undefined';
+
+  let negative = false;
+  if (typeof value === 'string' && value.startsWith('-')) {
+    negative = true;
+    value = value.slice(1); // remove the negative for processing
   }
-  return 'undefined'; // fallback
+
+  let result;
+  switch(value) {
+    case '1/2': result = '2'; break;
+    case 'rt2/2': result = '2rt2/2'; break;
+    case 'rt3/2': result = '2rt3/3'; break;
+    case 'rt3/3': result = '3/rt3'; break;
+    case '1': result = '1'; break;
+    default: result = 'undefined';
+  }
+
+  if (negative && result !== 'undefined') result = '-' + result;
+  return result;
 }
+  
 function getCsc(angle) {
   return reciprocal(answers[angle][0]); // 1/sin
 }
