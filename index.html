@@ -242,6 +242,17 @@
       .show-time .clock {
         display: block;
       }
+      .counter {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        font-size: 20px;
+        color: rgba(0, 0, 0, 0.5);
+        display: none;
+      }
+      .show-time .counter {
+        display: block;
+      }
       #score {
         font-size: 24px;
         width: 500px;
@@ -278,7 +289,7 @@
         <p><input type="checkbox" id="showcorrect" checked> <label for="showcorrect">Show correct answers?</label></p>
         <p><input type="checkbox" id="showtime" checked> <label for="showtime">Show time?</label></p>
         <p><input type="checkbox" id="limit20"> <label for="limit20">Limit to twenty problems?</label></p>
-        <p><input type="checkbox" id="showneg1"> <label for="showneg1">Show NEG button?<br><span style="font-size: 14px; color: #666;">works like a calc's 2nd button—for mobile</span></label></p>
+        <p><input type="checkbox" id="showneg1"> <label for="showneg1">Show NEG button?<br><span style="font-size: 14px; color: #666;">(works like a calc's 2nd button)</span></label></p>
       </div>
       <p style="margin-top: 15px; color: #F71111; font-size: 20px; font-style: italic;"> <span class="underline">Right-Click</span> a button to submit a <span class="underline">negative</span> number</p>
       <button id="start">Start</button>
@@ -308,6 +319,7 @@
       <div class="solution hidden" id="neg-btn" data-key=""><span class="small">NEG</span></div>
     </div>
     <div class="clock" id="clock">3:00</div>
+    <div class="counter" id="counter">0 / 0</div>
     <script>
 // Move formatRadian to global scope
 function formatRadian(deg) {
@@ -554,6 +566,7 @@ const checkboxes = {
 };
 
 const clock = document.getElementById('clock');
+const counter = document.getElementById('counter');
 const problemsWrapper = document.getElementById('problems');
 const score = document.getElementById('score');
 let problems, problem, wrongs, rights, startTime, clockStopper = null, playing = false;
@@ -609,6 +622,7 @@ document.getElementById('start').addEventListener('click', e => {
   startTime = Date.now();
   startClock();
   document.body.style.setProperty('--problem-n', problem = 0);
+  counter.textContent = '0 / ' + problems.length;
   document.body.classList.remove('show-intro-modal');
   playing = true;
 });
@@ -693,6 +707,7 @@ function submitAnswer(answer) {
   }
   problemsWrapper.children[problem].classList.remove('current');
   problem++;
+  counter.textContent = problem + ' / ' + problems.length;
   if (problem >= problems.length) {
     playing = false;
     window.cancelAnimationFrame(clockStopper);
