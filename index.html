@@ -325,7 +325,7 @@
     <script>
 // Move formatRadian to global scope
 function formatRadian(deg) {
-  const map = {
+   map = {
     0: [0,1], 30: [1,6], 45: [1,4], 60: [1,3],
     90: [1,2], 120: [2,3], 135: [3,4], 150: [5,6],
     180: [1,1], 210: [7,6], 225: [5,4], 240: [4,3],
@@ -618,6 +618,46 @@ document.getElementById('start').addEventListener('click', e => {
       html += formatRadian(deg) + '</span></span></div>';
     }
   });
+
+  // Get all solution buttons
+const solutionButtons = Array.from(document.querySelectorAll('.solutions .solution'));
+
+// Store original innerHTML of each button
+solutionButtons.forEach(btn => {
+  if (!btn.dataset.original) {
+    btn.dataset.original = btn.innerHTML;
+  }
+});
+
+// Map of answers to unrationalized display forms
+const answerMap = {
+  'rt3/2': '2/√3',
+  'rt3/3': '1/√3',
+  'rt2': '1/√2',
+  '-rt3/2': '-2/√3',
+  '-rt3/3': '-1/√3',
+  '-rt2': '-1/√2'
+};
+
+// Function to update labels based on checkbox
+function updateSolutionLabels() {
+  const unrationalize = checkboxes.unrationalize.checked;
+  solutionButtons.forEach(btn => {
+    const answer = btn.dataset.answer;
+    if (unrationalize && answerMap[answer]) {
+      btn.innerHTML = answerMap[answer];
+    } else {
+      // Revert to original label
+      btn.innerHTML = btn.dataset.original;
+    }
+  });
+}
+
+// Attach change event to the checkbox
+checkboxes.unrationalize.addEventListener('change', updateSolutionLabels);
+
+// Initialize labels on page load
+updateSolutionLabels();
   
   problemsWrapper.innerHTML = html;
   problemsWrapper.children[0].classList.add('current');
