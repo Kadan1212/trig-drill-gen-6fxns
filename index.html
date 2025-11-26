@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -323,6 +322,25 @@
     <div class="clock" id="clock">3:00</div>
     <div class="counter" id="counter">0 / 0</div>
     <script>
+function makeFractionHTMLFromAnswer(answer) {
+  const mappedAnswer = answerMap[answer]; // look up the answer
+  
+  if (mappedAnswer && typeof mappedAnswer === 'string') {
+    // Check if it's in fraction form, e.g., "2/√3"
+    if (mappedAnswer.includes('/')) {
+      const parts = mappedAnswer.split('/');
+      if (parts.length === 2) {
+        const numerator = parts[0].trim();
+        const denominator = parts[1].trim();
+        return `<span class="frac"><span class="numer">${numerator}</span><span class="denom">${denominator}</span></span>`;
+      }
+    }
+    // If not a fraction, just return the string
+    return mappedAnswer;
+  }
+  // No mapping found, return answer as plain text
+  return answer;
+}
 // Move formatRadian to global scope
 function formatRadian(deg) {
    map = {
@@ -645,7 +663,7 @@ function updateSolutionLabels() {
   solutionButtons.forEach(btn => {
     const answer = btn.dataset.answer;
     if (unrationalize && answerMap[answer]) {
-      btn.innerHTML = answerMap[answer];
+      btn.innerHTML = makeFractionHTMLFromAnswer(answer);
     } else {
       // Revert to original label
       btn.innerHTML = btn.dataset.original;
