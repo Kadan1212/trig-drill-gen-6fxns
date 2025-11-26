@@ -387,6 +387,7 @@ function generateDrill({
   coterminal = false,
   quadIOnly = false
 } = {}) {
+  const unRationalize = checkboxes.unRationalize.checked; // check if unrationalize is enabled
 
   function formatAnswer(value) {
     if (value === 0) return '0';
@@ -423,12 +424,11 @@ function generateDrill({
 
     let result = mapping[value];
     if (result) return result;
-    
-    // Numeric fallback
+
     if (typeof value === 'number' && value !== 0) {
       return (1 / value).toString();
     }
-    
+
     return 'und';
   }
 
@@ -452,76 +452,73 @@ function generateDrill({
     360: [0, 1, 0]
   };
 
-  function getAnswers(degrees) {
-    degrees = ((degrees % 360) + 360) % 360;
-
+  function getAnswers(deg) {
+    const degrees = ((deg % 360) + 360) % 360;
     if (exactValues[degrees] !== undefined) return exactValues[degrees].slice();
 
-    const rad = degrees * Math.PI / 180;
-    const sin = Math.round(Math.sin(rad) * 1000) / 1000;
-    const cos = Math.round(Math.cos(rad) * 1000) / 1000;
-    const tan = (cos === 0) ? 'und' : Math.round(Math.tan(rad) * 1000) / 1000;
+    const rad = useDegrees ? deg * Math.PI / 180 : deg;
+    const sinVal = Math.round(Math.sin(rad) * 1000) / 1000;
+    const cosVal = Math.round(Math.cos(rad) * 1000) / 1000;
+    const tanVal = (cosVal === 0) ? 'und' : Math.round(Math.tan(rad) * 1000) / 1000;
+    return [sinVal, cosVal, tanVal];
+  }
 
-    return [sin, cos, tan];
+  function addProblem(fn, arg, type, answer) {
+    // Apply unrationalize if needed for specific angles and answers
+    if (unRationalize) {
+      // For 2√3/3 -> 2/√3
+      if (answer === 'rt3/3') answer = '2/√3';
+      // For √3/3 -> 1/√3
+      if (answer === 'rt3/3') answer = '1/√3';
+      // For √2 -> 1/√2
+      if (answer === 'rt2') answer = '1/√2';
+    }
+    problems.push({ fn, arg, type, answer });
   }
 
   const problems = [];
 
-  function toRadians(degrees) {
-    return degrees * Math.PI / 180;
-  }
-
-  function angle(degrees) {
-    degrees = ((degrees % 360) + 360) % 360;
-
-    const anglesToAdd = [degrees];
+  function angle(deg) {
+    const anglesToAdd = [deg];
     if (coterminal) {
-      const plus360 = degrees + 360;
-      const minus360 = degrees - 360;
+      const plus360 = deg + 360;
+      const minus360 = deg - 360;
       if (plus360 <= 720) anglesToAdd.push(plus360);
       if (minus360 >= -360) anglesToAdd.push(minus360);
     }
 
-    anglesToAdd.forEach(deg => {
-      const [sin, cos, tan] = getAnswers(deg);
+    anglesToAdd.forEach(d => {
+      const [sin, cos, tan] = getAnswers(d);
       const tanVal = (cos === 0 || tan === 'und') ? 'und' : tan;
       const cotVal = (sin === 0 || tanVal === 'und') ? 'und' : reciprocal(tanVal);
       const secVal = (cos === 0) ? 'und' : reciprocal(cos);
       const cscVal = (sin === 0) ? 'und' : reciprocal(sin);
 
-      if (unRationalize) {
-        if (deg === 210 || deg === 330) {
-          answer = answer.startsWith('-') ? '-2/√3' : '2/√3';
-        }
-        if (deg === 120 || deg === 240) {
-          answer = answer.startsWith('-') ? '-1/√3' : '1/√3';
-        }
-        if (deg === 45 || deg === 135 || deg === 225 || deg === 315) {
-          answer = answer.startsWith('-') ? '-1/√2' : '1/√2';
-        }
-      }
-
+      // Now add problems, but check for specific angles and answers
+      // For 30°, 60°, 120°, 150°, 210°, 240°, 300°, 330°
       if (useDegrees) {
-        problems.push({fn: 'sin', arg: deg, type: 'degrees', answer: formatAnswer(sin)});
-        problems.push({fn: 'cos', arg: deg, type: 'degrees', answer: formatAnswer(cos)});
-        problems.push({fn: 'tan', arg: deg, type: 'degrees', answer: formatAnswer(tanVal)});
-        problems.push({fn: 'cot', arg: deg, type: 'degrees', answer: formatAnswer(cotVal)});
-        problems.push({fn: 'sec', arg: deg, type: 'degrees', answer: formatAnswer(secVal)});
-        problems.push({fn: 'csc', arg: deg, type: 'degrees', answer: formatAnswer(cscVal)});
+        // sin, cos, tan, etc.
+        addProblem('sin', d, 'degrees', formatAnswer(sin));
+        addProblem('cos', d, 'degrees', formatAnswer(cos));
+        addProblem('tan', d, 'degrees', formatAnswer(tanVal));
+        addProblem('cot', d, 'degrees', formatAnswer(cotVal));
+        addProblem('sec', d, 'degrees', formatAnswer(secVal));
+        addProblem('csc', d, 'degrees', formatAnswer(cscVal));
       }
 
       if (radians) {
-        const radArg = toRadians(deg);
-        problems.push({fn: 'sin', arg: radArg, type: 'radians', answer: formatAnswer(sin)});
-        problems.push({fn: 'cos', arg: radArg, type: 'radians', answer: formatAnswer(cos)});
-        problems.push({fn: 'tan', arg: radArg, type: 'radians', answer: formatAnswer(tanVal)});
-        problems.push({fn: 'cot', arg: radArg, type: 'radians', answer: formatAnswer(cotVal)});
-        problems.push({fn: 'sec', arg: radArg, type: 'radians', answer: formatAnswer(secVal)});
-        problems.push({fn: 'csc', arg: radArg, type: 'radians', answer: formatAnswer(cscVal)});
+        const radArg = d * Math.PI / 180;
+        addProblem('sin', radArg, 'radians', formatAnswer(sin));
+        addProblem('cos', radArg, 'radians', formatAnswer(cos));
+        addProblem('tan', radArg, 'radians', formatAnswer(tanVal));
+        addProblem('cot', radArg, 'radians', formatAnswer(cotVal));
+        addProblem('sec', radArg, 'radians', formatAnswer(secVal));
+        addProblem('csc', radArg, 'radians', formatAnswer(cscVal));
       }
     });
   }
 
+  // Base angles
   if (deg90s) {
     angle(0);
     angle(90);
@@ -551,9 +548,10 @@ function generateDrill({
       angle(315);
     }
   }
+
   return problems;
 }
-
+      
 function shuffle(arr) {
   for (let i = 0; i < arr.length; i++) {
     const index = Math.floor(Math.random() * (arr.length - i)) + i;
