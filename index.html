@@ -711,15 +711,13 @@ solutions.addEventListener('mousedown', e => {
     // If the 'Show unrationalized answers' option is checked,
     // convert the answer to the unrationalized form before submitting.
     if (checkboxes.unrationalize.checked) {
-      // Convert specific answers to their unrationalized forms
-      if (answer === '2√3/3') answer = '2/√3';
-      if (answer === '√3/3') answer = '1/√3';
-      if (answer === '√2') answer = '1/√2';
+       if (answer === '2/√3') answer = '2rt3/3';
+       if (answer === '1/√3') answer = '√3/3';
+       if (answer === '√2') answer = '√2';
 
-      // Also handle negative versions
-      if (answer === '-2√3/3') answer = '-2/√3';
-      if (answer === '-√3/3') answer = '-1/√3';
-      if (answer === '-√2') answer = '-1/√2';
+       if (answer === '-2/√3') answer = '-2rt3/3';
+       if (answer === '-√3/3') answer = '-√3/3';
+       if (answer === '-√2') answer = '-√2';
     }
 
     // Make answer negative if needed
