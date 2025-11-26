@@ -631,10 +631,10 @@ solutionButtons.forEach(btn => {
 
 // Map of answers to unrationalized display forms
 const answerMap = {
-  'rt3/2': '2/√3',
+  '2rt3/3': '2/√3',
   'rt3/3': '1/√3',
   'rt2': '1/√2',
-  '-rt3/2': '-2/√3',
+  '-2rt3/3': '-2/√3',
   '-rt3/3': '-1/√3',
   '-rt2': '-1/√2'
 };
@@ -708,8 +708,7 @@ solutions.addEventListener('mousedown', e => {
     e.preventDefault();
     let answer = solution.dataset.answer;
 
-    // If the 'Show unrationalized answers' option is checked,
-    // convert the answer to the unrationalized form before submitting.
+    // If the 'Show unrationalized answers' option is checked, convert the answer to the unrationalized form before submitting.
     if (checkboxes.unrationalize.checked) {
        if (answer === '2/√3') answer = '2rt3/3';
        if (answer === '1/√3') answer = '√3/3';
