@@ -279,10 +279,10 @@
       <div class="options">
         <p><input type="checkbox" id="coterminal" checked> <label for="coterminal">Include coterminal angles?</label></p>
         <p><input type="checkbox" id="quadionly"> <label for="quadionly">Limit to quadrant I angles?</label></p>
-        <p><input type="checkbox" id="limit20"> <label for="limit20">Limit to twenty problems?</label></p>
+        <p><input type="checkbox" id="limit20" checked> <label for="limit20">Limit to twenty problems?</label></p>
         <p><input type="checkbox" id="showneg1"> <label for="showneg1">Show NEG button?<br><span style="font-size: 14px; color: #666;">(works like a calc's 2nd button)</span></label></p>
-        <p><input type="checkbox" id="unrationalize"> <label for="unrationalize">Show unrationalized answers?</label></p>
-        <p><input type="checkbox" id="degrees" > <label for="degrees">Degrees?</label></p>
+        <p><input type="checkbox" id="unrationalize"> <label for="unrationalize">Unrationalize some answer options? (why)</label></p>
+        <p><input type="checkbox" id="degrees" checked> <label for="degrees">Degrees?</label></p>
         <p><input type="checkbox" id="radian" checked> <label for="radian">Radians?</label></p>
         <p><input type="checkbox" id="deg90s" checked> <label for="deg90s">Include 90&deg;-type angles?</label></p>
         <p><input type="checkbox" id="deg30s" checked> <label for="deg30s">Include 30&deg;- and 60&deg;-type angles?</label></p>
@@ -322,25 +322,6 @@
     <div class="clock" id="clock">3:00</div>
     <div class="counter" id="counter">0 / 0</div>
     <script>
-function makeFractionHTMLFromAnswer(answer) {
-  const mappedAnswer = answerMap[answer]; // look up the answer
-  
-  if (mappedAnswer && typeof mappedAnswer === 'string') {
-    // Check if it's in fraction form, e.g., "2/√3"
-    if (mappedAnswer.includes('/')) {
-      const parts = mappedAnswer.split('/');
-      if (parts.length === 2) {
-        const numerator = parts[0].trim();
-        const denominator = parts[1].trim();
-        return `<span class="frac"><span class="numer">${numerator}</span><span class="denom">${denominator}</span></span>`;
-      }
-    }
-    // If not a fraction, just return the string
-    return mappedAnswer;
-  }
-  // No mapping found, return answer as plain text
-  return answer;
-}
 // Move formatRadian to global scope
 function formatRadian(deg) {
    map = {
@@ -663,7 +644,7 @@ function updateSolutionLabels() {
   solutionButtons.forEach(btn => {
     const answer = btn.dataset.answer;
     if (unrationalize && answerMap[answer]) {
-      btn.innerHTML = makeFractionHTMLFromAnswer(answer);
+      btn.innerHTML = answerMap[answer];
     } else {
       // Revert to original label
       btn.innerHTML = btn.dataset.original;
