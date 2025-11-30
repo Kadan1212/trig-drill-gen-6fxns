@@ -200,6 +200,9 @@
         color: white;
         box-shadow: 0 0 15px rgba(32, 146, 227, 0.6);
       }
+      .unrationalized {
+        display: none;
+      }
       .show-unrationalized .rationalized {
         display: none;
       }
@@ -262,6 +265,25 @@
       .show-time .counter {
         display: block;
       }
+      .restart-btn {
+        position: fixed;
+        bottom: 35px;
+        left: 5px;
+        background-color: #2092e3;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 5px 10px;
+        font-size: 14px;
+        cursor: pointer;
+        display: none;
+      }
+      .show-time .restart-btn {
+        display: block;
+      }
+      .restart-btn:hover {
+        background-color: #1a7bc4;
+      }
       #score {
         font-size: 24px;
         width: 500px;
@@ -299,6 +321,7 @@
         <p><input type="checkbox" id="showtime" checked> <label for="showtime">Show time?</label></p>
         <p><input type="checkbox" id="limit20"> <label for="limit20">Limit to twenty problems?</label></p>
         <p><input type="checkbox" id="showneg1"> <label for="showneg1">Show NEG button?<br><span style="font-size: 14px; color: #666;">(works like a calc's 2nd button)</span></label></p>
+        <p><input type="checkbox" id="unrationalized"> <label for="unrationalized">Show unrationalized buttons?<br><span style="font-size: 14px; color: #666;">(2/√3, 1/√3, 1/√2)</span></label></p>
       </div>
       <p style="margin-top: 15px; color: #F71111; font-size: 20px; font-style: italic;"> <span class="underline">Right-Click</span> a button to submit a <span class="underline">negative</span> number</p>
       <button id="start">Start</button>
@@ -337,6 +360,7 @@
       <div class="solution hidden" id="neg-btn" data-key=""><span class="small">NEG</span></div>
     </div>
     <div class="clock" id="clock">3:00</div>
+    <button class="restart-btn" id="restart-btn">Restart</button>
     <div class="counter" id="counter">0 / 0</div>
     <script>
 // Move formatRadian to global scope
@@ -580,7 +604,8 @@ const checkboxes = {
   showCorrect: document.getElementById('showcorrect'),
   showTime: document.getElementById('showtime'),
   limit20: document.getElementById('limit20'),
-  showNeg1: document.getElementById('showneg1')
+  showNeg1: document.getElementById('showneg1'),
+  unrationalized: document.getElementById('unrationalized')
 };
 
 const clock = document.getElementById('clock');
@@ -620,6 +645,8 @@ document.getElementById('start').addEventListener('click', e => {
   if (options.showTime) document.body.classList.add('show-time');
   if (options.showNeg1) document.body.classList.add('show-neg1');
   else document.body.classList.remove('show-neg1');
+  if (options.unrationalized) document.body.classList.add('show-unrationalized');
+  else document.body.classList.remove('show-unrationalized');
   if (options.unrationalized) document.body.classList.add('show-unrationalized');
   else document.body.classList.remove('show-unrationalized');
   
@@ -745,6 +772,16 @@ function submitAnswer(answer) {
 document.getElementById('menu').addEventListener('click', e => {
   document.body.classList.remove('show-score');
 });
+
+document.getElementById('restart-btn').addEventListener('click', e => {
+  if (playing) {
+    document.body.classList.add('show-intro-modal');
+    window.cancelAnimationFrame(clockStopper);
+    playing = false;
+  }
+});
     </script>
+  </body>
+</html>
   </body>
 </html>
