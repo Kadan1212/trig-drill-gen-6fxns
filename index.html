@@ -14,9 +14,14 @@
         margin: 0 0.1em;
       }
       .numer {
-        display: table;
+        display: block;
         border-bottom: 0.03em solid currentColor;
         vertical-align: middle;
+        padding: 0 0.2em;
+      }
+      .denom {
+        display: block;
+        padding: 0 0.2em;
       }
       .sqrt {
         margin: 0 0.1em;
@@ -608,6 +613,31 @@ const checkboxes = {
   unrationalized: document.getElementById('unrationalized')
 };
 
+// Load saved preferences from localStorage
+function loadPreferences() {
+  Object.keys(checkboxes).forEach(key => {
+    const saved = localStorage.getItem(`pref_${key}`);
+    if (saved !== null) {
+      checkboxes[key].checked = saved === 'true';
+    }
+  });
+}
+
+// Save preferences to localStorage whenever a checkbox changes
+function savePreferences() {
+  Object.keys(checkboxes).forEach(key => {
+    localStorage.setItem(`pref_${key}`, checkboxes[key].checked);
+  });
+}
+
+// Load preferences on page load
+loadPreferences();
+
+// Add change listeners to all checkboxes to save preferences
+Object.values(checkboxes).forEach(checkbox => {
+  checkbox.addEventListener('change', savePreferences);
+});
+
 const clock = document.getElementById('clock');
 const counter = document.getElementById('counter');
 const problemsWrapper = document.getElementById('problems');
@@ -781,7 +811,5 @@ document.getElementById('restart-btn').addEventListener('click', e => {
   }
 });
     </script>
-  </body>
-</html>
   </body>
 </html>
