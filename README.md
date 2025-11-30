@@ -3,5 +3,3 @@ A few edits were made to include the other four trig functions<br><br>
 To do:<br>
 -weight rads over deg<br>
 -dark mode?<br>
--restart button<br><br>
--fix unrationalizes formatting
