@@ -1,5 +1,5 @@
-//<!DOCTYPE html>
-//<html lang="en">
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <title>Trig Drill Generator</title>
     <meta charset="UTF-8">
@@ -29,8 +29,8 @@
         content: '';
         display: block;
         position: absolute;
-        top: -.05em;
-        left: 0.5ch;
+        top: 0em;
+        left: 0.9ch;
         right: 0;
         border-top: 0.03em solid currentColor;
         height: 1px;
@@ -180,8 +180,31 @@
       .solution:hover {
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
       }
-      .solution:last-child {
+      .solution#und-btn {
         grid-column: 3 / 5;
+      }
+      .unrationalized {
+        display: none;
+      }
+      .solution.hidden {
+        display: none;
+      }
+      .show-neg1 .solution#und-btn {
+        grid-column: auto;
+      }
+      .show-neg1 .solution.hidden {
+        display: flex;
+      }
+      .solution#neg-btn.active {
+        background-color: #2092e3;
+        color: white;
+        box-shadow: 0 0 15px rgba(32, 146, 227, 0.6);
+      }
+      .show-unrationalized .rationalized {
+        display: none;
+      }
+      .show-unrationalized .unrationalized {
+        display: inline-block;
       }
       .solution::after {
         position: absolute;
@@ -228,6 +251,17 @@
       .show-time .clock {
         display: block;
       }
+      .counter {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        font-size: 20px;
+        color: rgba(0, 0, 0, 0.5);
+        display: none;
+      }
+      .show-time .counter {
+        display: block;
+      }
       #score {
         font-size: 24px;
         width: 500px;
@@ -264,8 +298,9 @@
         <p><input type="checkbox" id="showcorrect" checked> <label for="showcorrect">Show correct answers?</label></p>
         <p><input type="checkbox" id="showtime" checked> <label for="showtime">Show time?</label></p>
         <p><input type="checkbox" id="limit20"> <label for="limit20">Limit to twenty problems?</label></p>
+        <p><input type="checkbox" id="showneg1"> <label for="showneg1">Show NEG button?<br><span style="font-size: 14px; color: #666;">(works like a calc's 2nd button)</span></label></p>
       </div>
-      <p style="margin-top: 15px; color: #666; font-size: 14px; font-style: italic;"> Right-click any button to submit a negative number</p>
+      <p style="margin-top: 15px; color: #F71111; font-size: 20px; font-style: italic;"> <span class="underline">Right-Click</span> a button to submit a <span class="underline">negative</span> number</p>
       <button id="start">Start</button>
     </div>
     <div class="intro-modal score">
@@ -275,23 +310,34 @@
     <div class="problems" id="problems"></div>
     <div class="solutions" id="solutions">
       <!-- Row 1 -->
-      <div class="solution" data-key="q" data-answer="rt3/2"><span class="frac"><span class="numer"><span class="sqrt">3</span></span><span class="denom">2</span></span></div>
-      <div class="solution" data-key="w" data-answer="1/2"><span class="frac"><span class="numer">1</span><span class="denom">2</span></span></div>
-      <div class="solution" data-key="e" data-answer="rt2/2"><span class="frac"><span class="numer"><span class="sqrt">2</span></span><span class="denom">2</span></span></div>
-      <div class="solution" data-key="r" data-answer="1"><span>1</span></div>
+      <div class="solution" data-key="–√3/2" data-answer="rt3/2"><span class="frac"><span class="numer"><span class="sqrt">3</span></span><span class="denom">2</span></span></div>
+      <div class="solution" data-key="–1/2" data-answer="1/2"><span class="frac"><span class="numer">1</span><span class="denom">2</span></span></div>
+      <div class="solution" data-key="–√2/2" data-answer="rt2/2"><span class="frac"><span class="numer"><span class="sqrt">2</span></span><span class="denom">2</span></span></div>
+      <div class="solution" data-key="–1" data-answer="1"><span>1</span></div>
 
       <!-- Row 2 -->
-      <div class="solution" data-key="a" data-answer="2rt3/3"><span class="frac"><span class="numer">2<span class="sqrt">3</span></span><span class="denom">3</span></span></div>
-      <div class="solution" data-key="s" data-answer="2"><span>2</span></div>
-      <div class="solution" data-key="d" data-answer="rt2"><span class="sqrt">2</span></div>
-      <div class="solution" data-key="f" data-answer="0"><span>0</span></div>
+      <div class="solution" data-key="–2√3/3" data-answer="2rt3/3">
+        <span class="rationalized"><span class="frac"><span class="numer">2<span class="sqrt">3</span></span><span class="denom">3</span></span></span>
+        <span class="unrationalized hidden"><span class="frac"><span class="numer">2</span><span class="denom"><span class="sqrt">3</span></span></span></span>
+      </div>
+      <div class="solution" data-key="–2" data-answer="2"><span>2</span></div>
+      <div class="solution" data-key="–√2" data-answer="rt2">
+        <span class="rationalized"><span class="sqrt">2</span></span>
+        <span class="unrationalized hidden"><span class="frac"><span class="numer">1</span><span class="denom"><span class="sqrt">2</span></span></span></span>
+      </div>
+      <div class="solution" data-key="" data-answer="0"><span>0</span></div>
 
       <!-- Row 3 -->
-      <div class="solution" data-key="z" data-answer="rt3"><span class="sqrt">3</span></div>
-      <div class="solution" data-key="x" data-answer="rt3/3"><span class="frac"><span class="numer"><span class="sqrt">3</span></span><span class="denom">3</span></span></div>
-      <div class="solution" data-key="c" data-answer="und"><span class="small">und</span></div>
+      <div class="solution" data-key="–√3" data-answer="rt3"><span class="sqrt">3</span></div>
+      <div class="solution" data-key="–√3/3" data-answer="rt3/3">
+        <span class="rationalized"><span class="frac"><span class="numer"><span class="sqrt">3</span></span><span class="denom">3</span></span></span>
+        <span class="unrationalized hidden"><span class="frac"><span class="numer">1</span><span class="denom"><span class="sqrt">3</span></span></span></span>
+      </div>
+      <div class="solution" id="und-btn" data-key="" data-answer="und"><span class="small">und</span></div>
+      <div class="solution hidden" id="neg-btn" data-key=""><span class="small">NEG</span></div>
     </div>
     <div class="clock" id="clock">3:00</div>
+    <div class="counter" id="counter">0 / 0</div>
     <script>
 // Move formatRadian to global scope
 function formatRadian(deg) {
@@ -533,10 +579,12 @@ const checkboxes = {
   showCorrectness: document.getElementById('showcorrectness'),
   showCorrect: document.getElementById('showcorrect'),
   showTime: document.getElementById('showtime'),
-  limit20: document.getElementById('limit20')
+  limit20: document.getElementById('limit20'),
+  showNeg1: document.getElementById('showneg1')
 };
 
 const clock = document.getElementById('clock');
+const counter = document.getElementById('counter');
 const problemsWrapper = document.getElementById('problems');
 const score = document.getElementById('score');
 let problems, problem, wrongs, rights, startTime, clockStopper = null, playing = false;
@@ -549,8 +597,8 @@ function startClock() {
 function formatTime(time) {
   const minutes = Math.floor(time / 60000);
   const seconds = Math.floor(time / 1000) % 60;
-  const milliseconds = time % 1000;
-  return minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0') + '.' + milliseconds.toString().padStart(3, '0');
+  const tenths = Math.floor((time % 1000) / 100);
+  return minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0') + '.' + tenths;
 }
 
 document.getElementById('start').addEventListener('click', e => {
@@ -559,7 +607,7 @@ document.getElementById('start').addEventListener('click', e => {
   Object.keys(checkboxes).forEach(key => options[key] = checkboxes[key].checked);
   problems = shuffle(generateDrill(options));
   if (!problems.length) {
-    alert('Your settings disallow problems of any kind. Make them more lenient please!');
+    alert('Your settings disallow problems of any kind. Enable one type please!');
     return;
   }
   if (options.limit20) {
@@ -570,6 +618,10 @@ document.getElementById('start').addEventListener('click', e => {
   if (options.showCorrect) document.body.classList.add('show-correct');
   else document.body.classList.remove('show-correct');
   if (options.showTime) document.body.classList.add('show-time');
+  if (options.showNeg1) document.body.classList.add('show-neg1');
+  else document.body.classList.remove('show-neg1');
+  if (options.unrationalized) document.body.classList.add('show-unrationalized');
+  else document.body.classList.remove('show-unrationalized');
   
   let html = '';
   problems.forEach(({fn, arg, type, answer}) => {
@@ -590,6 +642,7 @@ document.getElementById('start').addEventListener('click', e => {
   startTime = Date.now();
   startClock();
   document.body.style.setProperty('--problem-n', problem = 0);
+  counter.textContent = '0 / ' + problems.length;
   document.body.classList.remove('show-intro-modal');
   playing = true;
 });
@@ -597,11 +650,27 @@ document.getElementById('start').addEventListener('click', e => {
 const keyCodeToAnswer = {
   81: 'rt3/2', 87: '1/2', 69: 'rt2/2', 82: '1',
   65: '2rt3/3', 83: '2', 68: 'rt2', 70: '0',
-  90: 'rt3', 88: 'rt3/3', 67: 'und'
+  90: 'rt3', 88: 'rt3/3', 67: 'und', 86: 'NEG'
 };
 
+let negativeMode = false;
+
 document.addEventListener('keydown', e => {
-  if (keyCodeToAnswer[e.keyCode]) submitAnswer(keyCodeToAnswer[e.keyCode]);
+  if (keyCodeToAnswer[e.keyCode]) {
+    const val = keyCodeToAnswer[e.keyCode];
+    if (val === 'NEG') {
+      negativeMode = !negativeMode;
+      document.getElementById('neg-btn').classList.toggle('active', negativeMode);
+    } else {
+      let answer = val;
+      if (negativeMode && answer !== '0' && answer !== 'und') {
+        answer = '-' + answer;
+        negativeMode = false;
+        document.getElementById('neg-btn').classList.remove('active');
+      }
+      submitAnswer(answer);
+    }
+  }
 });
 
 const solutions = document.getElementById('solutions');
@@ -614,12 +683,26 @@ solutions.addEventListener('mousedown', e => {
   const solution = e.target.closest('.solution');
   if (solution) {
     e.preventDefault();
+    
+    // Check if NEG button was clicked
+    if (solution.id === 'neg-btn') {
+      negativeMode = !negativeMode;
+      solution.classList.toggle('active', negativeMode);
+      return;
+    }
+    
     const isRightClick = e.button === 2;
     let answer = solution.dataset.answer;
     
-    // Make negative if right-click (but not for 0 or und)
-    if (isRightClick && answer !== '0' && answer !== 'und') {
+    // Make negative if right-click or negativeMode (but not for 0 or und)
+    if ((isRightClick || negativeMode) && answer !== '0' && answer !== 'und') {
       answer = answer.startsWith('-') ? answer.slice(1) : '-' + answer;
+    }
+    
+    // Reset negative mode after any answer submission
+    if (negativeMode) {
+      negativeMode = false;
+      document.getElementById('neg-btn').classList.remove('active');
     }
     
     submitAnswer(answer);
@@ -644,6 +727,7 @@ function submitAnswer(answer) {
   }
   problemsWrapper.children[problem].classList.remove('current');
   problem++;
+  counter.textContent = problem + ' / ' + problems.length;
   if (problem >= problems.length) {
     playing = false;
     window.cancelAnimationFrame(clockStopper);
@@ -663,4 +747,4 @@ document.getElementById('menu').addEventListener('click', e => {
 });
     </script>
   </body>
-//</html>
+</html>
