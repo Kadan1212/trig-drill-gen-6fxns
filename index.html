@@ -315,18 +315,19 @@
       <div class="options">
         <p><input type="checkbox" id="degrees" checked> <label for="degrees">Degrees?</label></p>
         <p><input type="checkbox" id="radian" checked> <label for="radian">Radians?</label></p>
+        <p><input type="checkbox" id="equalweight"> <label for="equalweight">Unweight degrees/radians?<br><span style="font-size: 14px; color: #666;">default is 3:1 radians:degrees</span></label></p>
+        <p><input type="checkbox" id="limit20"> <label for="limit20">Limit to twenty problems?</label></p>
+        <p><input type="checkbox" id="showneg1"> <label for="showneg1">Show NEG button?<br><span style="font-size: 14px; color: #666;">(works like a calc's 2nd button)</span></label></p>
+        <p><input type="checkbox" id="unrationalized"> <label for="unrationalized">Show unrationalized buttons?<br><span style="font-size: 14px; color: #666;">(2/√3, 1/√3, 1/√2)</span></label></p>
+        <p><input type="checkbox" id="quadionly"> <label for="quadionly">Limit to quadrant I angles?</label></p>
+        <p><input type="checkbox" id="coterminal" checked> <label for="coterminal">Include coterminal angles?</label></p>
+        <p><input type="checkbox" id="showtime" checked> <label for="showtime">Show time?</label></p>
         <p><input type="checkbox" id="deg90s" checked> <label for="deg90s">Include 90&deg;-type angles?</label></p>
         <p><input type="checkbox" id="deg30s" checked> <label for="deg30s">Include 30&deg;- and 60&deg;-type angles?</label></p>
         <p><input type="checkbox" id="deg45s" checked> <label for="deg45s">Include 45&deg;-type angles?</label></p>
         <p><input type="checkbox" id="include360" checked> <label for="include360">Include 360&deg;?</label></p>
-        <p><input type="checkbox" id="coterminal" checked> <label for="coterminal">Include coterminal angles?</label></p>
-        <p><input type="checkbox" id="quadionly"> <label for="quadionly">Limit to quadrant I angles?</label></p>
         <p><input type="checkbox" id="showcorrectness" checked> <label for="showcorrectness">Show wrong answers?</label></p>
         <p><input type="checkbox" id="showcorrect" checked> <label for="showcorrect">Show correct answers?</label></p>
-        <p><input type="checkbox" id="showtime" checked> <label for="showtime">Show time?</label></p>
-        <p><input type="checkbox" id="limit20"> <label for="limit20">Limit to twenty problems?</label></p>
-        <p><input type="checkbox" id="showneg1"> <label for="showneg1">Show NEG button?<br><span style="font-size: 14px; color: #666;">(works like a calc's 2nd button)</span></label></p>
-        <p><input type="checkbox" id="unrationalized"> <label for="unrationalized">Show unrationalized buttons?<br><span style="font-size: 14px; color: #666;">(2/√3, 1/√3, 1/√2)</span></label></p>
       </div>
       <p style="margin-top: 15px; color: #F71111; font-size: 20px; font-style: italic;"> <span class="underline">Right-Click</span> a button to submit a <span class="underline">negative</span> number</p>
       <button id="start">Start</button>
@@ -599,6 +600,7 @@ function shuffle(arr) {
 const checkboxes = {
   useDegrees: document.getElementById('degrees'),
   radians: document.getElementById('radian'),
+  equalWeight: document.getElementById('equalweight'),
   deg90s: document.getElementById('deg90s'),
   deg30s: document.getElementById('deg30s'),
   deg45s: document.getElementById('deg45s'),
