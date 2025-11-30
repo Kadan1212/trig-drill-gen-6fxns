@@ -316,12 +316,12 @@
       <div class="solution" data-key="–1" data-answer="1"><span>1</span></div>
 
       <!-- Row 2 -->
-      <div class="solution" data-key="–2√3/3" data-answer="2rt3/3">
+      <div class="solution" data-key="–2√3/3" data-answer="2/rt3">
         <span class="rationalized"><span class="frac"><span class="numer">2<span class="sqrt">3</span></span><span class="denom">3</span></span></span>
         <span class="unrationalized hidden"><span class="frac"><span class="numer">2</span><span class="denom"><span class="sqrt">3</span></span></span></span>
       </div>
       <div class="solution" data-key="–2" data-answer="2"><span>2</span></div>
-      <div class="solution" data-key="–√2" data-answer="rt2">
+      <div class="solution" data-key="–√2" data-answer="2/rt2">
         <span class="rationalized"><span class="sqrt">2</span></span>
         <span class="unrationalized hidden"><span class="frac"><span class="numer">1</span><span class="denom"><span class="sqrt">2</span></span></span></span>
       </div>
@@ -329,7 +329,7 @@
 
       <!-- Row 3 -->
       <div class="solution" data-key="–√3" data-answer="rt3"><span class="sqrt">3</span></div>
-      <div class="solution" data-key="–√3/3" data-answer="rt3/3">
+      <div class="solution" data-key="–√3/3" data-answer="1/rt3">
         <span class="rationalized"><span class="frac"><span class="numer"><span class="sqrt">3</span></span><span class="denom">3</span></span></span>
         <span class="unrationalized hidden"><span class="frac"><span class="numer">1</span><span class="denom"><span class="sqrt">3</span></span></span></span>
       </div>
@@ -419,20 +419,20 @@ function generateDrill({
     const mapping = {
       '1/2': '2',
       '-1/2': '-2',
-      'rt2/2': 'rt2',
-      '-rt2/2': '-rt2',
-      'rt3/2': '2rt3/3',
-      '-rt3/2': '-2rt3/3',
-      'rt3/3': 'rt3',
-      '-rt3/3': '-rt3',
-      'rt3': 'rt3/3',
-      '-rt3': '-rt3/3',
-      'rt2': 'rt2/2',
-      '-rt2': '-rt2/2',
+      'rt2/2': '2/rt2',
+      '-rt2/2': '-2/rt2',
+      'rt3/2': '2/rt3',
+      '-rt3/2': '-2/rt3',
+      '1/rt3': 'rt3',
+      '-1/rt3': '-rt3',
+      'rt3': '1/rt3',
+      '-rt3': '-1/rt3',
+      '2/rt2': 'rt2/2',
+      '-2/rt2': '-rt2/2',
       '2': '1/2',
       '-2': '-1/2',
-      '2rt3/3': 'rt3/2',
-      '-2rt3/3': '-rt3/2',
+      '2/rt3': 'rt3/2',
+      '-2/rt3': '-rt3/2',
       '1': '1',
       '-1': '-1',
       '0': 'und'
@@ -451,21 +451,21 @@ function generateDrill({
 
   const exactValues = {
     0:   [0, 1, 0],
-    30:  ['1/2', 'rt3/2', 'rt3/3'],
+    30:  ['1/2', 'rt3/2', '1/rt3'],
     45:  ['rt2/2', 'rt2/2', 1],
     60:  ['rt3/2', '1/2', 'rt3'],
     90:  [1, 0, 'und'],
     120: ['rt3/2', '-1/2', '-rt3'],
     135: ['rt2/2', '-rt2/2', -1],
-    150: ['1/2', '-rt3/2', '-rt3/3'],
+    150: ['1/2', '-rt3/2', '-1/rt3'],
     180: [0, -1, 0],
-    210: ['-1/2', '-rt3/2', 'rt3/3'],
+    210: ['-1/2', '-rt3/2', '1/rt3'],
     225: ['-rt2/2', '-rt2/2', 1],
     240: ['-rt3/2', '-1/2', 'rt3'],
     270: [-1, 0, 'und'],
     300: ['-rt3/2', '1/2', '-rt3'],
     315: ['-rt2/2', 'rt2/2', -1],
-    330: ['-1/2', 'rt3/2', '-rt3/3'],
+    330: ['-1/2', 'rt3/2', '-1/rt3'],
     360: [0, 1, 0]
   };
 
@@ -649,8 +649,8 @@ document.getElementById('start').addEventListener('click', e => {
 
 const keyCodeToAnswer = {
   81: 'rt3/2', 87: '1/2', 69: 'rt2/2', 82: '1',
-  65: '2rt3/3', 83: '2', 68: 'rt2', 70: '0',
-  90: 'rt3', 88: 'rt3/3', 67: 'und', 86: 'NEG'
+  65: '2/rt3', 83: '2', 68: '2/rt2', 70: '0',
+  90: 'rt3', 88: '1/rt3', 67: 'und', 86: 'NEG'
 };
 
 let negativeMode = false;
