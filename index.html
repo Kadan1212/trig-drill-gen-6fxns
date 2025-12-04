@@ -1,10 +1,13 @@
-<!DOCTYPE html>
+const checkboxes = {
+  useDegrees: document.getElementById('degrees'),
+  radians: document.getElementById('radian'),
+  equalWeight<!DOCTYPE html>
 <html lang="en">
   <head>
     <title>Trig Drill Generator</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <meta name="description" content="A drill trig generator for my precalc class.">
+    <meta name="description" content="A drill quiz generator for my trigonometry class.">
     <style>
       .frac {
         display: inline-block;
@@ -54,6 +57,61 @@
         font-size: 0;
         overflow: hidden;
         --problem-n: 0;
+      }
+      body.dark-mode {
+        background-color: #1a1a1a;
+        color: #e0e0e0;
+      }
+      body.dark-mode .intro-modal {
+        background-color: #2a2a2a;
+        color: #e0e0e0;
+      }
+      body.dark-mode h2 {
+        color: #b0b0b0;
+      }
+      body.dark-mode .options label,
+      body.dark-mode .options span {
+        color: #e0e0e0;
+      }
+      body.dark-mode .solution {
+        background-color: #2a2a2a;
+        color: #e0e0e0;
+      }
+      body.dark-mode .problem {
+        border-right-color: rgba(255, 255, 255, 0.1);
+        color: #e0e0e0;
+      }
+      body.dark-mode .clock,
+      body.dark-mode .counter {
+        color: rgba(255, 255, 255, 0.5);
+      }
+      body.dark-mode .solution::after {
+        color: rgba(255, 255, 255, 0.3);
+      }
+      body.dark-mode {
+        background-color: #1a1a1a;
+        color: #e0e0e0;
+      }
+      body.dark-mode .intro-modal {
+        background-color: #2a2a2a;
+        color: #e0e0e0;
+      }
+      body.dark-mode h2 {
+        color: #b0b0b0;
+      }
+      body.dark-mode .solution {
+        background-color: #2a2a2a;
+        color: #e0e0e0;
+      }
+      body.dark-mode .problem {
+        border-right-color: rgba(255, 255, 255, 0.1);
+      }
+      body.dark-mode .clock,
+      body.dark-mode .counter {
+        color: rgba(255, 255, 255, 0.5);
+      }
+      body.dark-mode .solution::after {
+        color: rgba(255, 255, 255, 0.3);
       }
       .show-intro-modal {
         display: flex;
@@ -142,13 +200,13 @@
         opacity: 1;
       }
       .show-wrong .wrong {
-        color: #d12525;
+        color: #c75050 !important;
       }
       .show-correct .wrong .answer {
         opacity: 1;
       }
       .show-wrong .correct {
-        color: #0a530a;
+        color: #5a9e5a !important;
       }
       .fn {
         margin-right: 0.1em;
@@ -230,6 +288,9 @@
           top: auto;
           height: 50vh;
           background-image: linear-gradient(0deg, rgba(255, 255, 255, 0.8), transparent);
+        }
+        body.dark-mode .solutions {
+          background-image: linear-gradient(0deg, rgba(26, 26, 26, 0.8), transparent);
         }
         .solution {
           font-size: 5vh;
@@ -313,19 +374,20 @@
       <h1>Trig Drill Generator</h1>
       <h2>Options</h2>
       <div class="options">
+        <p><input type="checkbox" id="darkmode"> <label for="darkmode">Dark mode?</label></p>
+        <p><input type="checkbox" id="unrationalized"> <label for="unrationalized">Show unrationalized buttons?<br><span style="font-size: 14px; color: #666;">(2/√3, 1/√3, 1/√2)</span></label></p>
+        <p><input type="checkbox" id="showneg1"> <label for="showneg1">Show NEG button?<br><span style="font-size: 14px; color: #666;">(works like a calc's 2nd button)</span></label></p>
+        <p><input type="checkbox" id="coterminal" checked> <label for="coterminal">Include coterminal angles?</label></p>
+        <p><input type="checkbox" id="quadionly"> <label for="quadionly">Limit to quadrant I angles?</label></p>
+        <p><input type="checkbox" id="limit20"> <label for="limit20">Limit to twenty problems?</label></p>
         <p><input type="checkbox" id="degrees" checked> <label for="degrees">Degrees?</label></p>
         <p><input type="checkbox" id="radian" checked> <label for="radian">Radians?</label></p>
-        <p><input type="checkbox" id="equalweight"> <label for="equalweight">Unweight degrees/radians?<br><span style="font-size: 14px; color: #666;">default is 3:1 radians:degrees...[wip]</span></label></p>
-        <p><input type="checkbox" id="limit20"> <label for="limit20">Limit to twenty problems?</label></p>
-        <p><input type="checkbox" id="showneg1"> <label for="showneg1">Show NEG button?<br><span style="font-size: 14px; color: #666;">(works like a calc's 2nd button)</span></label></p>
-        <p><input type="checkbox" id="unrationalized"> <label for="unrationalized">Show unrationalized buttons?<br><span style="font-size: 14px; color: #666;">(2/√3, 1/√3, 1/√2)</span></label></p>
-        <p><input type="checkbox" id="quadionly"> <label for="quadionly">Limit to quadrant I angles?</label></p>
-        <p><input type="checkbox" id="coterminal" checked> <label for="coterminal">Include coterminal angles?</label></p>
-        <p><input type="checkbox" id="showtime" checked> <label for="showtime">Show time?</label></p>
-        <p><input type="checkbox" id="deg90s" checked> <label for="deg90s">Include 90&deg;-type angles?</label></p>
+        <p><input type="checkbox" id="equalweight"> <label for="equalweight">Equal weight degrees/radians?<br><span style="font-size: 14px; color: #666;">(default is 3/4 radians, 1/4 degrees) [wip]</span></label></p>
+         <p><input type="checkbox" id="deg90s" checked> <label for="deg90s">Include 90&deg;-type angles?</label></p>
         <p><input type="checkbox" id="deg30s" checked> <label for="deg30s">Include 30&deg;- and 60&deg;-type angles?</label></p>
         <p><input type="checkbox" id="deg45s" checked> <label for="deg45s">Include 45&deg;-type angles?</label></p>
         <p><input type="checkbox" id="include360" checked> <label for="include360">Include 360&deg;?</label></p>
+        <p><input type="checkbox" id="showtime" checked> <label for="showtime">Show time?</label></p>
         <p><input type="checkbox" id="showcorrectness" checked> <label for="showcorrectness">Show wrong answers?</label></p>
         <p><input type="checkbox" id="showcorrect" checked> <label for="showcorrect">Show correct answers?</label></p>
       </div>
@@ -612,7 +674,8 @@ const checkboxes = {
   showTime: document.getElementById('showtime'),
   limit20: document.getElementById('limit20'),
   showNeg1: document.getElementById('showneg1'),
-  unrationalized: document.getElementById('unrationalized')
+  unrationalized: document.getElementById('unrationalized'),
+  darkMode: document.getElementById('darkmode')
 };
 
 // Load saved preferences from localStorage
@@ -623,6 +686,10 @@ function loadPreferences() {
       checkboxes[key].checked = saved === 'true';
     }
   });
+  // Apply dark mode immediately if it was saved
+  if (checkboxes.darkMode.checked) {
+    document.body.classList.add('dark-mode');
+  }
 }
 
 // Save preferences to localStorage whenever a checkbox changes
@@ -638,6 +705,15 @@ loadPreferences();
 // Add change listeners to all checkboxes to save preferences
 Object.values(checkboxes).forEach(checkbox => {
   checkbox.addEventListener('change', savePreferences);
+});
+
+// Add special listener for dark mode to toggle immediately
+checkboxes.darkMode.addEventListener('change', () => {
+  if (checkboxes.darkMode.checked) {
+    document.body.classList.add('dark-mode');
+  } else {
+    document.body.classList.remove('dark-mode');
+  }
 });
 
 const clock = document.getElementById('clock');
