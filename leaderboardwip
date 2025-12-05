@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -58,6 +59,10 @@
         border-radius: 30px;
         padding: 30px;
         display: none;
+        position: relative;
+      }
+      .show-intro-modal .intro-modal {
+        display: flex;
       }
       .show-score .score {
         display: block;
@@ -67,6 +72,28 @@
       }
       .show-score .not-score {
         display: none;
+      }
+      .show-leaderboard .leaderboard-modal {
+        display: block;
+      }
+      .show-leaderboard .not-leaderboard {
+        display: none;
+      }
+      #leaderboard-btn {
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        background: none;
+        background-color: #2092e3;
+        border-radius: 10px;
+        padding: 10px 15px;
+        border: none;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      #leaderboard-btn:hover {
+        background-color: #1a7bc4;
       }
       h1 {
         margin: 0;
@@ -80,7 +107,7 @@
         color: #666;
         font-size: 16px;
       }
-      #start, #menu {
+      #start, #menu, #back {
         background: none;
         background-color: #2092e3;
         border-radius: 10px;
@@ -282,7 +309,8 @@
     </style>
   </head>
   <body class="show-intro-modal">
-    <div class="intro-modal not-score">
+    <div class="intro-modal not-score not-leaderboard">
+      <button id="leaderboard-btn">Leaderboard</button>
       <h1>Trig Drill Generator</h1>
       <h2>Options</h2>
       <div class="options">
@@ -303,9 +331,19 @@
       <p style="margin-top: 15px; color: #F71111; font-size: 20px; font-style: italic;"> <span class="underline">Right-Click</span> a button to submit a <span class="underline">negative</span> number</p>
       <button id="start">Start</button>
     </div>
-    <div class="intro-modal score">
+    <div class="intro-modal score not-leaderboard">
       <div id="score"></div>
-      <button id="menu">Menu</button>
+      <button id="menu">Back</button>
+    </div>
+    <div class="intro-modal leaderboard-modal">
+      <h1>Leaderboard</h1>
+      <p style="font-size: 16px; line-height: 1.6; color: #666; margin-bottom: 20px;">
+        To submit a score, check: <strong>limit to 20 problems</strong>, <strong>degrees + radians</strong>, <strong>all angles + coterminal</strong>, & uncheck <strong>quad I angles</strong>. Other options don't matter.
+      </p>
+      <p style="font-size: 16px; line-height: 1.6; color: #666;">
+        The score is calculated as following: <strong>MM:SS.S + (wrong answers × 15sec)</strong>
+      </p>
+      <button id="back">Back</button>
     </div>
     <div class="problems" id="problems"></div>
     <div class="solutions" id="solutions">
@@ -339,14 +377,12 @@
     <div class="clock" id="clock">3:00</div>
     <div class="counter" id="counter">0 / 0</div>
     <script>
-// Move formatRadian to global scope
 function formatRadian(deg) {
   const map = {
     0: [0,1], 30: [1,6], 45: [1,4], 60: [1,3],
     90: [1,2], 120: [2,3], 135: [3,4], 150: [5,6],
     180: [1,1], 210: [7,6], 225: [5,4], 240: [4,3],
     270: [3,2], 300: [5,3], 315: [7,4], 330: [11,6], 360: [2,1],
-    // Add coterminal angles
     390: [13,6], 420: [7,3], 450: [5,2], 480: [8,3],
     510: [17,6], 540: [3,1], 570: [19,6], 600: [10,3],
     630: [7,2], 660: [11,3], 690: [23,6], 720: [4,1],
@@ -356,14 +392,11 @@ function formatRadian(deg) {
     '-270': [-3,2], '-300': [-5,3], '-315': [-7,4], '-330': [-11,6], '-360': [-2,1]
   };
   
-  // Normalize to get the key
   const normalizedDeg = deg % 360;
   const key = Math.abs(deg - Math.round(deg)) < 0.01 ? Math.round(deg).toString() : deg.toString();
   
   const f = map[key] || map[normalizedDeg];
   if (!f) {
-    // Convert any angle to fraction of π
-    // Find GCD to simplify the fraction
     function gcd(a, b) {
       a = Math.abs(a);
       b = Math.abs(b);
@@ -375,7 +408,6 @@ function formatRadian(deg) {
       return a;
     }
     
-    // deg/180 = num/denom (in terms of π)
     let num = Math.round(deg);
     let denom = 180;
     const divisor = gcd(num, denom);
@@ -441,7 +473,6 @@ function generateDrill({
     let result = mapping[value];
     if (result) return result;
     
-    // Numeric fallback
     if (typeof value === 'number' && value !== 0) {
       return (1 / value).toString();
     }
@@ -644,6 +675,7 @@ document.getElementById('start').addEventListener('click', e => {
   document.body.style.setProperty('--problem-n', problem = 0);
   counter.textContent = '0 / ' + problems.length;
   document.body.classList.remove('show-intro-modal');
+  document.body.classList.remove('show-leaderboard');
   playing = true;
 });
 
@@ -684,7 +716,6 @@ solutions.addEventListener('mousedown', e => {
   if (solution) {
     e.preventDefault();
     
-    // Check if NEG button was clicked
     if (solution.id === 'neg-btn') {
       negativeMode = !negativeMode;
       solution.classList.toggle('active', negativeMode);
@@ -694,12 +725,10 @@ solutions.addEventListener('mousedown', e => {
     const isRightClick = e.button === 2;
     let answer = solution.dataset.answer;
     
-    // Make negative if right-click or negativeMode (but not for 0 or und)
     if ((isRightClick || negativeMode) && answer !== '0' && answer !== 'und') {
       answer = answer.startsWith('-') ? answer.slice(1) : '-' + answer;
     }
     
-    // Reset negative mode after any answer submission
     if (negativeMode) {
       negativeMode = false;
       document.getElementById('neg-btn').classList.remove('active');
@@ -709,7 +738,6 @@ solutions.addEventListener('mousedown', e => {
   }
 });
 
-// Prevent context menu on solution buttons
 solutions.addEventListener('contextmenu', e => {
   if (e.target.closest('.solution')) {
     e.preventDefault();
@@ -743,6 +771,15 @@ function submitAnswer(answer) {
 }
 
 document.getElementById('menu').addEventListener('click', e => {
+  document.body.classList.remove('show-score');
+});
+
+document.getElementById('leaderboard-btn').addEventListener('click', e => {
+  document.body.classList.add('show-leaderboard');
+});
+
+document.getElementById('back').addEventListener('click', e => {
+  document.body.classList.remove('show-leaderboard');
   document.body.classList.remove('show-score');
 });
     </script>
