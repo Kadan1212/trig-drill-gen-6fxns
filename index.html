@@ -89,31 +89,6 @@
       body.dark-mode .solution::after {
         color: rgba(255, 255, 255, 0.3);
       }
-      body.dark-mode {
-        background-color: #1a1a1a;
-        color: #e0e0e0;
-      }
-      body.dark-mode .intro-modal {
-        background-color: #2a2a2a;
-        color: #e0e0e0;
-      }
-      body.dark-mode h2 {
-        color: #b0b0b0;
-      }
-      body.dark-mode .solution {
-        background-color: #2a2a2a;
-        color: #e0e0e0;
-      }
-      body.dark-mode .problem {
-        border-right-color: rgba(255, 255, 255, 0.1);
-      }
-      body.dark-mode .clock,
-      body.dark-mode .counter {
-        color: rgba(255, 255, 255, 0.5);
-      }
-      body.dark-mode .solution::after {
-        color: rgba(255, 255, 255, 0.3);
-      }
       .show-intro-modal {
         display: flex;
       }
@@ -275,9 +250,6 @@
         background-color: #2092e3;
         color: white;
         box-shadow: 0 0 15px rgba(32, 146, 227, 0.6);
-      }
-      .unrationalized {
-        display: none;
       }
       .show-unrationalized .rationalized {
         display: none;
@@ -496,67 +468,9 @@
     <div class="clock" id="clock">3:00</div>
     <button class="restart-btn" id="restart-btn">Back</button>
     <div class="counter" id="counter">0 / 0</div>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <script>
-// Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyBFOaBwJhAl4IhXZF-XqodH_YHiN2rVjiE",
-  authDomain: "trig-drill-gen-6fxns.firebaseapp.com",
-  databaseURL: "https://trig-drill-gen-6fxns-default-rtdb.firebaseio.com",
-  projectId: "trig-drill-gen-6fxns",
-  storageBucket: "trig-drill-gen-6fxns.firebasestorage.app",
-  messagingSenderId: "175456183276",
-  appId: "1:175456183276:web:6b84030991c967563a56c9",
-  measurementId: "G-HPBG8N4NWF"
-};
-
-// Initialize Firebase
-let database;
-let useFirebase = false;
-
-try {
-  firebase.initializeApp(firebaseConfig);
-  database = firebase.database();
-  useFirebase = true;
-} catch (error) {
-  console.warn('Firebase not configured, using fallback storage');
-}
-
-// Storage abstraction layer
-const storage = {
-  async get(key) {
-    if (useFirebase) {
-      const snapshot = await database.ref('leaderboard').once('value');
-      if (snapshot.exists()) {
-        return { value: JSON.stringify(snapshot.val()) };
-      }
-      return null;
-    } else if (window.storage) {
-      return await window.storage.get(key, true);
-    } else {
-      const data = localStorage.getItem(key);
-      return data ? { value: data } : null;
-    }
-  },
-  
-  async set(key, value) {
-    if (useFirebase) {
-      const data = JSON.parse(value);
-      await database.ref('leaderboard').set(data);
-    } else if (window.storage) {
-      await window.storage.set(key, value, true);
-    } else {
-      localStorage.setItem(key, value);
-    }
-  },
-  
-  async delete(index) {
-    if (useFirebase) {
-      await database.ref(`leaderboard/${index}`).remove();
-    }
-  }
-};
+// Firebase REST API URL
+const FIREBASE_URL = 'https://trig-drill-gen-6fxns-default-rtdb.firebaseio.com';
 
 // Move formatRadian to global scope
 function formatRadian(deg) {
@@ -575,14 +489,11 @@ function formatRadian(deg) {
     '-270': [-3,2], '-300': [-5,3], '-315': [-7,4], '-330': [-11,6], '-360': [-2,1]
   };
   
-  // Normalize to get the key
   const normalizedDeg = deg % 360;
   const key = Math.abs(deg - Math.round(deg)) < 0.01 ? Math.round(deg).toString() : deg.toString();
   
   const f = map[key] || map[normalizedDeg];
   if (!f) {
-    // Convert any angle to fraction of π
-    // Find GCD to simplify the fraction
     function gcd(a, b) {
       a = Math.abs(a);
       b = Math.abs(b);
@@ -594,7 +505,6 @@ function formatRadian(deg) {
       return a;
     }
     
-    // deg/180 = num/denom (in terms of π)
     let num = Math.round(deg);
     let denom = 180;
     const divisor = gcd(num, denom);
@@ -612,17 +522,18 @@ function formatRadian(deg) {
   return `<span class="frac"><span class="numer">${num === 1 ? '' : num === -1 ? '-' : num}&pi;</span><span class="denom">${denom}</span></span>`;
 }
 
-function generateDrill({
-  useDegrees = true,
-  radians = false,
-  tan: includeTan = false,
-  deg90s = true,
-  deg30s = true,
-  deg45s = true,
-  include360 = true,
-  coterminal = false,
-  quadIOnly = false
-} = {}) {
+function generateDrill(options = {}) {
+  const {
+    useDegrees = true,
+    radians = false,
+    tan: includeTan = false,
+    deg90s = true,
+    deg30s = true,
+    deg45s = true,
+    include360 = true,
+    coterminal = false,
+    quadIOnly = false
+  } = options;
 
   function formatAnswer(value) {
     if (value === 0) return '0';
@@ -660,7 +571,6 @@ function generateDrill({
     let result = mapping[value];
     if (result) return result;
     
-    // Numeric fallback
     if (typeof value === 'number' && value !== 0) {
       return (1 / value).toString();
     }
@@ -804,7 +714,6 @@ const checkboxes = {
   darkMode: document.getElementById('darkmode')
 };
 
-// Load saved preferences from localStorage
 function loadPreferences() {
   Object.keys(checkboxes).forEach(key => {
     const saved = localStorage.getItem(`pref_${key}`);
@@ -812,28 +721,23 @@ function loadPreferences() {
       checkboxes[key].checked = saved === 'true';
     }
   });
-  // Apply dark mode immediately if it was saved
   if (checkboxes.darkMode.checked) {
     document.body.classList.add('dark-mode');
   }
 }
 
-// Save preferences to localStorage whenever a checkbox changes
 function savePreferences() {
   Object.keys(checkboxes).forEach(key => {
     localStorage.setItem(`pref_${key}`, checkboxes[key].checked);
   });
 }
 
-// Load preferences on page load
 loadPreferences();
 
-// Add change listeners to all checkboxes to save preferences
 Object.values(checkboxes).forEach(checkbox => {
   checkbox.addEventListener('change', savePreferences);
 });
 
-// Add special listener for dark mode to toggle immediately
 checkboxes.darkMode.addEventListener('change', () => {
   if (checkboxes.darkMode.checked) {
     document.body.classList.add('dark-mode');
@@ -879,8 +783,6 @@ document.getElementById('start').addEventListener('click', e => {
   if (options.showTime) document.body.classList.add('show-time');
   if (options.showNeg1) document.body.classList.add('show-neg1');
   else document.body.classList.remove('show-neg1');
-  if (options.unrationalized) document.body.classList.add('show-unrationalized');
-  else document.body.classList.remove('show-unrationalized');
   if (options.unrationalized) document.body.classList.add('show-unrationalized');
   else document.body.classList.remove('show-unrationalized');
   
@@ -949,7 +851,6 @@ solutions.addEventListener('mousedown', e => {
   if (solution) {
     e.preventDefault();
     
-    // Check if NEG button was clicked
     if (solution.id === 'neg-btn') {
       negativeMode = !negativeMode;
       solution.classList.toggle('active', negativeMode);
@@ -959,12 +860,10 @@ solutions.addEventListener('mousedown', e => {
     const isRightClick = e.button === 2;
     let answer = solution.dataset.answer;
     
-    // Make negative if right-click or negativeMode (but not for 0 or und)
     if ((isRightClick || negativeMode) && answer !== '0' && answer !== 'und') {
       answer = answer.startsWith('-') ? answer.slice(1) : '-' + answer;
     }
     
-    // Reset negative mode after any answer submission
     if (negativeMode) {
       negativeMode = false;
       document.getElementById('neg-btn').classList.remove('active');
@@ -974,7 +873,6 @@ solutions.addEventListener('mousedown', e => {
   }
 });
 
-// Prevent context menu on solution buttons
 solutions.addEventListener('contextmenu', e => {
   if (e.target.closest('.solution')) {
     e.preventDefault();
@@ -999,7 +897,6 @@ function submitAnswer(answer) {
     const time = Date.now() - startTime;
     score.innerHTML = `It took you <strong>${formatTime(time)}</strong> to get <strong>${rights}</strong> out of ${problems.length} correct.<br>That means it'll take you ${formatTime(Math.round(time / problems.length * 10))} to do 10 problems.`;
     
-    // Check if settings meet leaderboard requirements
     const meetsRequirements = checkboxes.limit20.checked && 
                              checkboxes.useDegrees.checked && 
                              checkboxes.radians.checked && 
@@ -1011,9 +908,8 @@ function submitAnswer(answer) {
                              !checkboxes.quadIOnly.checked;
     
     if (meetsRequirements) {
-      // Calculate leaderboard score: time + (wrongs * 15sec) + (2sec if unrationalized)
-      const wrongsPenalty = wrongs * 15000; // 15 seconds in milliseconds
-      const unrationalizedPenalty = checkboxes.unrationalized.checked ? 2000 : 0; // 2 seconds in milliseconds
+      const wrongsPenalty = wrongs * 15000;
+      const unrationalizedPenalty = checkboxes.unrationalized.checked ? 2000 : 0;
       const finalScore = time + wrongsPenalty + unrationalizedPenalty;
       
       document.getElementById('final-score').textContent = formatTime(finalScore);
@@ -1033,7 +929,6 @@ function submitAnswer(answer) {
 }
 
 document.getElementById('restart-btn').addEventListener('click', e => {
-  // If we're on the initials screen, go back to submit score screen
   if (document.getElementById('initials-input').style.display === 'block') {
     document.getElementById('initials-input').style.display = 'none';
     document.getElementById('leaderboard-submit').style.display = 'block';
@@ -1049,7 +944,6 @@ document.getElementById('restart-btn').addEventListener('click', e => {
   document.querySelector('.leaderboard-screen').style.display = 'none';
   document.querySelector('.not-score').style.display = 'block';
   
-  // Reset initials screen in case it was showing
   document.getElementById('initials-input').style.display = 'none';
   document.getElementById('leaderboard-submit').style.display = 'none';
   document.getElementById('initials-field').value = '';
@@ -1067,7 +961,6 @@ let devClickCount = 0;
 let devClickTimer = null;
 
 document.getElementById('leaderboard-btn').addEventListener('click', e => {
-  // Secret dev mode: click 5 times within 2 seconds
   devClickCount++;
   
   if (devClickCount === 5) {
@@ -1075,7 +968,7 @@ document.getElementById('leaderboard-btn').addEventListener('click', e => {
     alert(isDevMode ? 'Dev mode enabled' : 'Dev mode disabled');
     devClickCount = 0;
     clearTimeout(devClickTimer);
-    loadLeaderboard(); // Refresh display to show/hide delete buttons
+    loadLeaderboard();
   }
   
   if (devClickTimer) clearTimeout(devClickTimer);
@@ -1083,11 +976,6 @@ document.getElementById('leaderboard-btn').addEventListener('click', e => {
     devClickCount = 0;
   }, 2000);
   
-  document.body.classList.remove('show-intro-modal');
-  document.body.classList.add('show-leaderboard');
-  document.querySelector('.leaderboard-screen').style.display = 'block';
-  document.querySelector('.not-score').style.display = 'none';
-});
   document.body.classList.remove('show-intro-modal');
   document.body.classList.add('show-leaderboard');
   document.querySelector('.leaderboard-screen').style.display = 'block';
@@ -1101,20 +989,24 @@ document.getElementById('submit-score').addEventListener('click', e => {
 });
 
 document.getElementById('initials-field').addEventListener('input', e => {
-  // Only allow letters
   e.target.value = e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
 });
 
-document.getElementById('initials-field').addEventListener('keydown', async e => {
+document.getElementById('initials-field').addEventListener('keypress', async e => {
+  console.log('Key pressed:', e.key);
   if (e.key === 'Enter') {
+    console.log('Enter key detected');
+    e.preventDefault();
     const initials = e.target.value.trim().toUpperCase();
+    console.log('Initials:', initials, 'Length:', initials.length);
+    
     if (initials.length !== 2) {
+      console.log('Invalid length');
       e.target.style.borderColor = '#c75050';
       e.target.style.backgroundColor = '#ffcccc';
       return;
     }
     
-    // Check for blocked initials
     if (initials === 'FU') {
       alert('nice try lol');
       e.target.style.borderColor = '#c75050';
@@ -1128,21 +1020,20 @@ document.getElementById('initials-field').addEventListener('keydown', async e =>
     }
     
     const finalScoreText = document.getElementById('final-score').textContent;
+    console.log('Attempting to submit score:', finalScoreText);
+    
+    e.target.style.borderColor = '#2092e3';
+    e.target.style.backgroundColor = '#ffffcc';
     
     try {
-      // Get existing leaderboard
-      let leaderboard = [];
-      try {
-        const leaderboardData = await storage.get('leaderboard');
-        leaderboard = leaderboardData ? JSON.parse(leaderboardData.value) : [];
-      } catch (getError) {
-        leaderboard = [];
-      }
+      console.log('Fetching leaderboard from Firebase REST API...');
       
-      // Add new score
+      const response = await fetch(`${FIREBASE_URL}/leaderboard.json`);
+      let leaderboard = await response.json() || [];
+      console.log('Current leaderboard:', leaderboard);
+      
       leaderboard.push({ initials, score: finalScoreText });
       
-      // Sort by time (convert MM:SS.S to milliseconds for comparison)
       leaderboard.sort((a, b) => {
         const timeToMs = (timeStr) => {
           const parts = timeStr.split(':');
@@ -1153,20 +1044,21 @@ document.getElementById('initials-field').addEventListener('keydown', async e =>
         return timeToMs(a.score) - timeToMs(b.score);
       });
       
-      // Keep only top 15
       leaderboard = leaderboard.slice(0, 15);
       
-      // Save to storage
-      await storage.set('leaderboard', JSON.stringify(leaderboard));
+      console.log('Saving leaderboard to Firebase...');
+      const saveResponse = await fetch(`${FIREBASE_URL}/leaderboard.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(leaderboard)
+      });
+      console.log('Leaderboard saved successfully');
       
-      // Update leaderboard display
       updateLeaderboardDisplay(leaderboard);
       
-      // Success - turn green
       e.target.style.borderColor = '#5a9e5a';
       e.target.style.backgroundColor = '#ccffcc';
       
-      // After 1 second, go back to menu
       setTimeout(() => {
         document.body.classList.remove('show-score');
         document.body.classList.add('show-intro-modal');
@@ -1179,99 +1071,11 @@ document.getElementById('initials-field').addEventListener('keydown', async e =>
       }, 1000);
       
     } catch (error) {
-      // Error - turn red
-      e.target.style.borderColor = '#c75050';
-      e.target.style.backgroundColor = '#ffcccc';
       console.error('Error submitting score:', error);
-      
-      // Reset after 2 seconds
-      setTimeout(() => {
-        e.target.style.borderColor = '#2092e3';
-        e.target.style.backgroundColor = 'white';
-      }, 2000);
-    }
-  }
-});.length !== 2) {
-      e.target.style.borderColor = '#c75050';
-      e.target.style.backgroundColor = '#ffcccc';
-      return;
-    }
-    
-    // Check for blocked initials
-    if (initials === 'FU') {
-      alert('nice try lol');
-      e.target.style.borderColor = '#c75050';
-      e.target.style.backgroundColor = '#ffcccc';
-      e.target.value = '';
-      setTimeout(() => {
-        e.target.style.borderColor = '#2092e3';
-        e.target.style.backgroundColor = 'white';
-      }, 2000);
-      return;
-    }
-    
-    const finalScoreText = document.getElementById('final-score').textContent;
-    
-    try {
-      // Get existing leaderboard
-      let leaderboard = [];
-      try {
-        const leaderboardData = await window.storage.get('leaderboard', true);
-        leaderboard = leaderboardData ? JSON.parse(leaderboardData.value) : [];
-      } catch (getError) {
-        // Silently start fresh if can't load existing data
-        leaderboard = [];
-      }
-      
-      // Add new score
-      leaderboard.push({ initials, score: finalScoreText });
-      
-      // Sort by time (convert MM:SS.S to milliseconds for comparison)
-      leaderboard.sort((a, b) => {
-        const timeToMs = (timeStr) => {
-          const parts = timeStr.split(':');
-          const minutes = parseInt(parts[0]);
-          const seconds = parseFloat(parts[1]);
-          return minutes * 60000 + seconds * 1000;
-        };
-        return timeToMs(a.score) - timeToMs(b.score);
-      });
-      
-      // Keep only top 15
-      leaderboard = leaderboard.slice(0, 15);
-      
-      // Save to storage
-      try {
-        await window.storage.set('leaderboard', JSON.stringify(leaderboard), true);
-      } catch (setError) {
-        throw setError;
-      }
-      
-      // Update leaderboard display
-      updateLeaderboardDisplay(leaderboard);
-      
-      // Success - turn green
-      e.target.style.borderColor = '#5a9e5a';
-      e.target.style.backgroundColor = '#ccffcc';
-      
-      // After 1 second, go back to menu
-      setTimeout(() => {
-        document.body.classList.remove('show-score');
-        document.body.classList.add('show-intro-modal');
-        document.querySelector('.not-score').style.display = 'block';
-        document.getElementById('initials-input').style.display = 'none';
-        document.getElementById('leaderboard-submit').style.display = 'none';
-        e.target.style.borderColor = '#2092e3';
-        e.target.style.backgroundColor = 'white';
-        e.target.value = '';
-      }, 1000);
-      
-    } catch (error) {
-      // Error - turn red
+      alert('Error: ' + error.message);
       e.target.style.borderColor = '#c75050';
       e.target.style.backgroundColor = '#ffcccc';
       
-      // Reset after 2 seconds
       setTimeout(() => {
         e.target.style.borderColor = '#2092e3';
         e.target.style.backgroundColor = 'white';
@@ -1302,81 +1106,49 @@ function updateLeaderboardDisplay(leaderboard) {
   }
 }
 
-let isDevMode = false;
-let devClickCount = 0;
-let devClickTimer = null;
-
-// Secret dev mode: click "Leaderboard" 5 times within 2 seconds
-document.getElementById('leaderboard-btn').addEventListener('click', e => {
-  devClickCount++;
-  
-  if (devClickCount === 5) {
-    isDevMode = !isDevMode;
-    alert(isDevMode ? 'Dev mode enabled' : 'Dev mode disabled');
-    devClickCount = 0;
-    clearTimeout(devClickTimer);
-    loadLeaderboard(); // Refresh display
-    return;
-  }
-  
-  if (devClickTimer) clearTimeout(devClickTimer);
-  devClickTimer = setTimeout(() => {
-    devClickCount = 0;
-  }, 2000);
-  
-  document.body.classList.remove('show-intro-modal');
-  document.body.classList.add('show-leaderboard');
-  document.querySelector('.leaderboard-screen').style.display = 'block';
-  document.querySelector('.not-score').style.display = 'none';
-});
-
-// Handle delete button clicks
 document.getElementById('leaderboard-body').addEventListener('click', async e => {
   if (e.target.classList.contains('delete-btn') && isDevMode) {
     const index = parseInt(e.target.dataset.index);
     
     try {
-      const leaderboardData = await storage.get('leaderboard');
-      let leaderboard = leaderboardData ? JSON.parse(leaderboardData.value) : [];
+      const response = await fetch(`${FIREBASE_URL}/leaderboard.json`);
+      let leaderboard = await response.json() || [];
       
-      // Remove the entry
       leaderboard.splice(index, 1);
       
-      // Save updated leaderboard
-      await storage.set('leaderboard', JSON.stringify(leaderboard));
+      await fetch(`${FIREBASE_URL}/leaderboard.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(leaderboard)
+      });
       
-      // Update display
       updateLeaderboardDisplay(leaderboard);
     } catch (error) {
       alert('Error deleting entry');
+      console.error('Error deleting entry:', error);
     }
   }
 });
 
-// Load leaderboard on page load
 async function loadLeaderboard() {
   try {
-    const leaderboardData = await storage.get('leaderboard');
-    if (leaderboardData) {
-      const leaderboard = JSON.parse(leaderboardData.value);
+    const response = await fetch(`${FIREBASE_URL}/leaderboard.json`);
+    if (!response.ok) throw new Error('HTTP error: ' + response.status);
+    const leaderboard = await response.json();
+    if (leaderboard) {
       updateLeaderboardDisplay(leaderboard);
+      console.log('Leaderboard loaded successfully');
     }
   } catch (error) {
-    // Silently fail - leaderboard will show default empty state
+    console.error('Error loading leaderboard:', error);
+    console.log('Note: Firebase may not work in Claude artifacts due to CORS restrictions.');
+    console.log('This will work when hosted on GitHub Pages or your own domain.');
   }
 }
 
 loadLeaderboard();
 
-// If using Firebase, listen for real-time updates
-if (useFirebase) {
-  database.ref('leaderboard').on('value', (snapshot) => {
-    if (snapshot.exists()) {
-      const leaderboard = snapshot.val();
-      updateLeaderboardDisplay(leaderboard);
-    }
-  });
-}
+setInterval(loadLeaderboard, 5000);
     </script>
   </body>
 </html>
