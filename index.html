@@ -54,6 +54,10 @@
         font-size: 0;
         overflow: hidden;
         --problem-n: 0;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
       }
       body.dark-mode {
         background-color: #1a1a1a;
@@ -119,6 +123,9 @@
         padding: 30px;
         display: none;
       }
+      .show-intro-modal .intro-modal.not-score {
+        display: block;
+      }
       .show-score .score {
         display: block;
       }
@@ -167,6 +174,15 @@
       }
       .show-intro-modal .problems, .show-intro-modal .solutions, .show-intro-modal .clock {
         display: none;
+      }
+      .show-leaderboard .problems, .show-leaderboard .solutions, .show-leaderboard .clock {
+        display: none;
+      }
+      .show-leaderboard .intro-modal:not(.leaderboard-screen) {
+        display: none;
+      }
+      .show-leaderboard .leaderboard-screen {
+        display: block !important;
       }
       .problem {
         font-size: 14vh;
@@ -344,6 +360,12 @@
       .show-time .restart-btn {
         display: block;
       }
+      .show-leaderboard .restart-btn {
+        display: block;
+      }
+      .show-score .restart-btn {
+        display: block;
+      }
       .restart-btn:hover {
         background-color: #1a7bc4;
       }
@@ -352,6 +374,9 @@
         width: 500px;
         margin-bottom: 10px;
         max-width: 70vw;
+      }
+      #score {
+        font-size: 16px;
       }
       .options {
         max-height: 50vh;
@@ -368,6 +393,7 @@
   </head>
   <body class="show-intro-modal">
     <div class="intro-modal not-score">
+      <button id="leaderboard-btn" style="position: absolute; top: 20px; right: 20px; background-color: #2092e3; color: white; border: none; border-radius: 5px; padding: 8px 15px; font-size: 14px; cursor: pointer;">Leaderboard</button>
       <h1>Trig Drill Generator</h1>
       <h2>Options</h2>
       <div class="options">
@@ -392,7 +418,50 @@
     </div>
     <div class="intro-modal score">
       <div id="score"></div>
-      <button id="menu">Menu</button>
+      <div id="leaderboard-submit" style="display: none; margin-top: 20px; font-size: 20px; text-align: center;">
+        <hr style="border: none; border-top: 1px solid #ccc; margin: 20px 0;">
+        <p id="score-calculation" style="font-size: 14px; color: #666; margin-bottom: 5px;"></p>
+        <p>Your score: <strong id="final-score"></strong></p>
+        <p style="margin-top: 10px;">This score is able to be submitted to the leaderboard. Submit?</p>
+        <button id="submit-score" style="background-color: #2092e3; color: white; border: none; border-radius: 10px; padding: 15px 30px; font-size: 20px; cursor: pointer; margin-top: 10px;">Submit Score</button>
+      </div>
+      <div id="initials-input" style="display: none; margin-top: 20px; text-align: center;">
+        <hr style="border: none; border-top: 1px solid #ccc; margin: 20px 0;">
+        <p style="font-size: 18px; margin-bottom: 10px;">INITIALS:</p>
+        <input type="text" id="initials-field" maxlength="2" style="font-size: 24px; padding: 10px; width: 80px; text-align: center; border: 2px solid #2092e3; border-radius: 5px; text-transform: uppercase;" />
+        <p style="font-size: 16px; margin-top: 10px; color: #666;">Click Enter to submit.</p>
+      </div>
+    </div>
+    <div class="intro-modal leaderboard-screen" style="display: none;">
+      <h1 style="text-align: center;">Leaderboard</h1>
+      <p style="font-size: 16px; margin-top: 20px;">To submit a score, check: <strong>limit to 20 problems, degrees + radians, all angles + coterminal, & uncheck quad I angles.</strong> Other options don't matter.</p>
+      <p style="font-size: 16px; margin-top: 15px; white-space: nowrap;">The score is calculated as following: MM:SS.S + (wrong answers*15sec) + 2 sec if unrationalizing is checked (making it harder to do subsequent operations).</p>
+      <table style="width: 100%; margin-top: 30px; border-collapse: collapse; font-size: 18px;">
+        <thead>
+          <tr style="border-bottom: 2px solid #333;">
+            <th style="padding: 10px; text-align: center; width: 15%;">Place</th>
+            <th style="padding: 10px; text-align: left;">Initials</th>
+            <th style="padding: 10px; text-align: left; padding-left: 20px;">Score</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-body">
+          <tr><td style="padding: 8px; text-align: center;">1</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
+          <tr><td style="padding: 8px; text-align: center;">2</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
+          <tr><td style="padding: 8px; text-align: center;">3</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
+          <tr><td style="padding: 8px; text-align: center;">4</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
+          <tr><td style="padding: 8px; text-align: center;">5</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
+          <tr><td style="padding: 8px; text-align: center;">6</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
+          <tr><td style="padding: 8px; text-align: center;">7</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
+          <tr><td style="padding: 8px; text-align: center;">8</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
+          <tr><td style="padding: 8px; text-align: center;">9</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
+          <tr><td style="padding: 8px; text-align: center;">10</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
+          <tr><td style="padding: 8px; text-align: center;">11</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
+          <tr><td style="padding: 8px; text-align: center;">12</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
+          <tr><td style="padding: 8px; text-align: center;">13</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
+          <tr><td style="padding: 8px; text-align: center;">14</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
+          <tr><td style="padding: 8px; text-align: center;">15</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
+        </tbody>
+      </table>
     </div>
     <div class="problems" id="problems"></div>
     <div class="solutions" id="solutions">
@@ -424,7 +493,7 @@
       <div class="solution hidden" id="neg-btn" data-key=""><span class="small">NEG</span></div>
     </div>
     <div class="clock" id="clock">3:00</div>
-    <button class="restart-btn" id="restart-btn">Restart</button>
+    <button class="restart-btn" id="restart-btn">Back</button>
     <div class="counter" id="counter">0 / 0</div>
     <script>
 // Move formatRadian to global scope
@@ -774,6 +843,10 @@ document.getElementById('start').addEventListener('click', e => {
   document.body.style.setProperty('--problem-n', problem = 0);
   counter.textContent = '0 / ' + problems.length;
   document.body.classList.remove('show-intro-modal');
+  document.body.classList.remove('show-leaderboard');
+  document.body.classList.remove('show-score');
+  document.querySelector('.not-score').style.display = 'none';
+  document.querySelector('.leaderboard-screen').style.display = 'none';
   playing = true;
 });
 
@@ -862,7 +935,32 @@ function submitAnswer(answer) {
     playing = false;
     window.cancelAnimationFrame(clockStopper);
     const time = Date.now() - startTime;
-    score.innerHTML = `It took you <strong>${formatTime(time)}</strong> to get <strong>${rights}</strong> out of ${problems.length} correct. That means it'll take you ${formatTime(Math.round(time / problems.length * 20))} to do 20 problems.`;
+    score.innerHTML = `It took you <strong>${formatTime(time)}</strong> to get <strong>${rights}</strong> out of ${problems.length} correct.<br>That means it'll take you ${formatTime(Math.round(time / problems.length * 10))} to do 10 problems.`;
+    
+    // Check if settings meet leaderboard requirements
+    const meetsRequirements = checkboxes.limit20.checked && 
+                             checkboxes.useDegrees.checked && 
+                             checkboxes.radians.checked && 
+                             checkboxes.deg90s.checked && 
+                             checkboxes.deg30s.checked && 
+                             checkboxes.deg45s.checked && 
+                             checkboxes.include360.checked && 
+                             checkboxes.coterminal.checked &&
+                             !checkboxes.quadIOnly.checked;
+    
+    if (meetsRequirements) {
+      // Calculate leaderboard score: time + (wrongs * 15sec) + (2sec if unrationalized)
+      const wrongsPenalty = wrongs * 15000; // 15 seconds in milliseconds
+      const unrationalizedPenalty = checkboxes.unrationalized.checked ? 2000 : 0; // 2 seconds in milliseconds
+      const finalScore = time + wrongsPenalty + unrationalizedPenalty;
+      
+      document.getElementById('final-score').textContent = formatTime(finalScore);
+      document.getElementById('score-calculation').textContent = `${formatTime(time)} + (${wrongs} wrong*15sec) + ${unrationalizedPenalty / 1000} sec`;
+      document.getElementById('leaderboard-submit').style.display = 'block';
+    } else {
+      document.getElementById('leaderboard-submit').style.display = 'none';
+    }
+    
     document.body.classList.add('show-intro-modal');
     document.body.classList.add('show-score');
     document.body.classList.remove('show-time');
@@ -872,17 +970,176 @@ function submitAnswer(answer) {
   problemsWrapper.children[problem].classList.add('current');
 }
 
-document.getElementById('menu').addEventListener('click', e => {
-  document.body.classList.remove('show-score');
-});
-
 document.getElementById('restart-btn').addEventListener('click', e => {
+  // If we're on the initials screen, go back to submit score screen
+  if (document.getElementById('initials-input').style.display === 'block') {
+    document.getElementById('initials-input').style.display = 'none';
+    document.getElementById('leaderboard-submit').style.display = 'block';
+    document.getElementById('initials-field').value = '';
+    document.getElementById('initials-field').style.borderColor = '#2092e3';
+    document.getElementById('initials-field').style.backgroundColor = 'white';
+    return;
+  }
+  
+  document.body.classList.remove('show-leaderboard');
+  document.body.classList.remove('show-score');
+  document.body.classList.add('show-intro-modal');
+  document.querySelector('.leaderboard-screen').style.display = 'none';
+  document.querySelector('.not-score').style.display = 'block';
+  
+  // Reset initials screen in case it was showing
+  document.getElementById('initials-input').style.display = 'none';
+  document.getElementById('leaderboard-submit').style.display = 'none';
+  document.getElementById('initials-field').value = '';
+  document.getElementById('initials-field').style.borderColor = '#2092e3';
+  document.getElementById('initials-field').style.backgroundColor = 'white';
+  
   if (playing) {
-    document.body.classList.add('show-intro-modal');
     window.cancelAnimationFrame(clockStopper);
     playing = false;
   }
 });
+
+document.getElementById('leaderboard-btn').addEventListener('click', e => {
+  document.body.classList.remove('show-intro-modal');
+  document.body.classList.add('show-leaderboard');
+  document.querySelector('.leaderboard-screen').style.display = 'block';
+  document.querySelector('.not-score').style.display = 'none';
+});
+
+document.getElementById('submit-score').addEventListener('click', e => {
+  document.getElementById('leaderboard-submit').style.display = 'none';
+  document.getElementById('initials-input').style.display = 'block';
+  document.getElementById('initials-field').focus();
+});
+
+document.getElementById('initials-field').addEventListener('input', e => {
+  // Only allow letters
+  e.target.value = e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
+});
+
+document.getElementById('initials-field').addEventListener('keydown', async e => {
+  if (e.key === 'Enter') {
+    const initials = e.target.value.trim().toUpperCase();
+    if (initials.length !== 2) {
+      e.target.style.borderColor = '#c75050';
+      e.target.style.backgroundColor = '#ffcccc';
+      return;
+    }
+    
+    // Check for blocked initials
+    if (initials === 'FU') {
+      alert('nice try lol');
+      e.target.style.borderColor = '#c75050';
+      e.target.style.backgroundColor = '#ffcccc';
+      e.target.value = '';
+      setTimeout(() => {
+        e.target.style.borderColor = '#2092e3';
+        e.target.style.backgroundColor = 'white';
+      }, 2000);
+      return;
+    }
+    
+    const finalScoreText = document.getElementById('final-score').textContent;
+    
+    try {
+      // Get existing leaderboard
+      let leaderboard = [];
+      try {
+        const leaderboardData = await window.storage.get('leaderboard', true);
+        leaderboard = leaderboardData ? JSON.parse(leaderboardData.value) : [];
+      } catch (getError) {
+        // Silently start fresh if can't load existing data
+        leaderboard = [];
+      }
+      
+      // Add new score
+      leaderboard.push({ initials, score: finalScoreText });
+      
+      // Sort by time (convert MM:SS.S to milliseconds for comparison)
+      leaderboard.sort((a, b) => {
+        const timeToMs = (timeStr) => {
+          const parts = timeStr.split(':');
+          const minutes = parseInt(parts[0]);
+          const seconds = parseFloat(parts[1]);
+          return minutes * 60000 + seconds * 1000;
+        };
+        return timeToMs(a.score) - timeToMs(b.score);
+      });
+      
+      // Keep only top 15
+      leaderboard = leaderboard.slice(0, 15);
+      
+      // Save to storage
+      try {
+        await window.storage.set('leaderboard', JSON.stringify(leaderboard), true);
+      } catch (setError) {
+        throw setError;
+      }
+      
+      // Update leaderboard display
+      updateLeaderboardDisplay(leaderboard);
+      
+      // Success - turn green
+      e.target.style.borderColor = '#5a9e5a';
+      e.target.style.backgroundColor = '#ccffcc';
+      
+      // After 1 second, go back to menu
+      setTimeout(() => {
+        document.body.classList.remove('show-score');
+        document.body.classList.add('show-intro-modal');
+        document.querySelector('.not-score').style.display = 'block';
+        document.getElementById('initials-input').style.display = 'none';
+        document.getElementById('leaderboard-submit').style.display = 'none';
+        e.target.style.borderColor = '#2092e3';
+        e.target.style.backgroundColor = 'white';
+        e.target.value = '';
+      }, 1000);
+      
+    } catch (error) {
+      // Error - turn red
+      e.target.style.borderColor = '#c75050';
+      e.target.style.backgroundColor = '#ffcccc';
+      
+      // Reset after 2 seconds
+      setTimeout(() => {
+        e.target.style.borderColor = '#2092e3';
+        e.target.style.backgroundColor = 'white';
+      }, 2000);
+    }
+  }
+});
+
+function updateLeaderboardDisplay(leaderboard) {
+  const tbody = document.getElementById('leaderboard-body');
+  const rows = tbody.getElementsByTagName('tr');
+  
+  for (let i = 0; i < 15; i++) {
+    const cells = rows[i].getElementsByTagName('td');
+    if (leaderboard[i]) {
+      cells[1].textContent = leaderboard[i].initials;
+      cells[2].textContent = leaderboard[i].score;
+    } else {
+      cells[1].textContent = '--';
+      cells[2].textContent = '--:--.-';
+    }
+  }
+}
+
+// Load leaderboard on page load
+async function loadLeaderboard() {
+  try {
+    const leaderboardData = await window.storage.get('leaderboard', true);
+    if (leaderboardData) {
+      const leaderboard = JSON.parse(leaderboardData.value);
+      updateLeaderboardDisplay(leaderboard);
+    }
+  } catch (error) {
+    // Silently fail - leaderboard will show default empty state
+  }
+}
+
+loadLeaderboard();
     </script>
   </body>
 </html>
