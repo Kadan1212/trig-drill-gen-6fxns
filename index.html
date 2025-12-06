@@ -393,7 +393,7 @@
   </head>
   <body class="show-intro-modal">
     <div class="intro-modal not-score">
-      <button id="leaderboard-btn" style="position: absolute; top: 20px; right: 20px; background-color: #2092e3; color: white; border: none; border-radius: 8px; padding: 8px 12px; font-size: 18px; cursor: pointer; font-weight: 600;">Leaderboard</button>
+      <button id="leaderboard-btn" style="position: absolute; top: 20px; right: 20px; background-color: #2092e3; color: white; border: none; border-radius: 8px; padding: 12px 20px; font-size: 16px; cursor: pointer; font-weight: 600;">Leaderboard</button>
       <h1>Trig Drill Generator</h1>
       <h2>Options</h2>
       <div class="options">
@@ -402,7 +402,7 @@
         <p><input type="checkbox" id="showneg1"> <label for="showneg1">Show NEG button?<br><span style="font-size: 14px; color: #666;">(works like a calc's 2nd button)</span></label></p>
         <p><input type="checkbox" id="coterminal" checked> <label for="coterminal">Include coterminal angles?</label></p>
         <p><input type="checkbox" id="quadionly"> <label for="quadionly">Limit to quadrant I angles?</label></p>
-        <p><input type="checkbox" id="limit20" checked> <label for="limit20">Limit to twenty problems?</label></p>
+        <p><input type="checkbox" id="limit20"> <label for="limit20">Limit to twenty problems?</label></p>
         <p><input type="checkbox" id="degrees" checked> <label for="degrees">Degrees?</label></p>
         <p><input type="checkbox" id="radian" checked> <label for="radian">Radians?</label></p>
         <p><input type="checkbox" id="deg90s" checked> <label for="deg90s">Include 90&deg;-type angles?</label></p>
@@ -442,24 +442,25 @@
             <th style="padding: 10px; text-align: center; width: 15%;">Place</th>
             <th style="padding: 10px; text-align: left;">Initials</th>
             <th style="padding: 10px; text-align: left; padding-left: 20px;">Score</th>
+            <th style="padding: 10px; text-align: center; width: 10%;"></th>
           </tr>
         </thead>
         <tbody id="leaderboard-body">
-          <tr><td style="padding: 8px; text-align: center;">1</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
-          <tr><td style="padding: 8px; text-align: center;">2</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
-          <tr><td style="padding: 8px; text-align: center;">3</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
-          <tr><td style="padding: 8px; text-align: center;">4</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
-          <tr><td style="padding: 8px; text-align: center;">5</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
-          <tr><td style="padding: 8px; text-align: center;">6</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
-          <tr><td style="padding: 8px; text-align: center;">7</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
-          <tr><td style="padding: 8px; text-align: center;">8</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
-          <tr><td style="padding: 8px; text-align: center;">9</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
-          <tr><td style="padding: 8px; text-align: center;">10</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
-          <tr><td style="padding: 8px; text-align: center;">11</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
-          <tr><td style="padding: 8px; text-align: center;">12</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
-          <tr><td style="padding: 8px; text-align: center;">13</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
-          <tr><td style="padding: 8px; text-align: center;">14</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
-          <tr><td style="padding: 8px; text-align: center;">15</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td></tr>
+          <tr><td style="padding: 8px; text-align: center;">1</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td><td style="padding: 8px; text-align: center;"><button class="delete-btn" data-index="0" style="display: none; background-color: #c75050; color: white; border: none; border-radius: 3px; padding: 4px 8px; font-size: 12px; cursor: pointer;">Delete</button></td></tr>
+          <tr><td style="padding: 8px; text-align: center;">2</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td><td style="padding: 8px; text-align: center;"><button class="delete-btn" data-index="1" style="display: none; background-color: #c75050; color: white; border: none; border-radius: 3px; padding: 4px 8px; font-size: 12px; cursor: pointer;">Delete</button></td></tr>
+          <tr><td style="padding: 8px; text-align: center;">3</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td><td style="padding: 8px; text-align: center;"><button class="delete-btn" data-index="2" style="display: none; background-color: #c75050; color: white; border: none; border-radius: 3px; padding: 4px 8px; font-size: 12px; cursor: pointer;">Delete</button></td></tr>
+          <tr><td style="padding: 8px; text-align: center;">4</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td><td style="padding: 8px; text-align: center;"><button class="delete-btn" data-index="3" style="display: none; background-color: #c75050; color: white; border: none; border-radius: 3px; padding: 4px 8px; font-size: 12px; cursor: pointer;">Delete</button></td></tr>
+          <tr><td style="padding: 8px; text-align: center;">5</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td><td style="padding: 8px; text-align: center;"><button class="delete-btn" data-index="4" style="display: none; background-color: #c75050; color: white; border: none; border-radius: 3px; padding: 4px 8px; font-size: 12px; cursor: pointer;">Delete</button></td></tr>
+          <tr><td style="padding: 8px; text-align: center;">6</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td><td style="padding: 8px; text-align: center;"><button class="delete-btn" data-index="5" style="display: none; background-color: #c75050; color: white; border: none; border-radius: 3px; padding: 4px 8px; font-size: 12px; cursor: pointer;">Delete</button></td></tr>
+          <tr><td style="padding: 8px; text-align: center;">7</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td><td style="padding: 8px; text-align: center;"><button class="delete-btn" data-index="6" style="display: none; background-color: #c75050; color: white; border: none; border-radius: 3px; padding: 4px 8px; font-size: 12px; cursor: pointer;">Delete</button></td></tr>
+          <tr><td style="padding: 8px; text-align: center;">8</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td><td style="padding: 8px; text-align: center;"><button class="delete-btn" data-index="7" style="display: none; background-color: #c75050; color: white; border: none; border-radius: 3px; padding: 4px 8px; font-size: 12px; cursor: pointer;">Delete</button></td></tr>
+          <tr><td style="padding: 8px; text-align: center;">9</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td><td style="padding: 8px; text-align: center;"><button class="delete-btn" data-index="8" style="display: none; background-color: #c75050; color: white; border: none; border-radius: 3px; padding: 4px 8px; font-size: 12px; cursor: pointer;">Delete</button></td></tr>
+          <tr><td style="padding: 8px; text-align: center;">10</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td><td style="padding: 8px; text-align: center;"><button class="delete-btn" data-index="9" style="display: none; background-color: #c75050; color: white; border: none; border-radius: 3px; padding: 4px 8px; font-size: 12px; cursor: pointer;">Delete</button></td></tr>
+          <tr><td style="padding: 8px; text-align: center;">11</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td><td style="padding: 8px; text-align: center;"><button class="delete-btn" data-index="10" style="display: none; background-color: #c75050; color: white; border: none; border-radius: 3px; padding: 4px 8px; font-size: 12px; cursor: pointer;">Delete</button></td></tr>
+          <tr><td style="padding: 8px; text-align: center;">12</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td><td style="padding: 8px; text-align: center;"><button class="delete-btn" data-index="11" style="display: none; background-color: #c75050; color: white; border: none; border-radius: 3px; padding: 4px 8px; font-size: 12px; cursor: pointer;">Delete</button></td></tr>
+          <tr><td style="padding: 8px; text-align: center;">13</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td><td style="padding: 8px; text-align: center;"><button class="delete-btn" data-index="12" style="display: none; background-color: #c75050; color: white; border: none; border-radius: 3px; padding: 4px 8px; font-size: 12px; cursor: pointer;">Delete</button></td></tr>
+          <tr><td style="padding: 8px; text-align: center;">14</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td><td style="padding: 8px; text-align: center;"><button class="delete-btn" data-index="13" style="display: none; background-color: #c75050; color: white; border: none; border-radius: 3px; padding: 4px 8px; font-size: 12px; cursor: pointer;">Delete</button></td></tr>
+          <tr><td style="padding: 8px; text-align: center;">15</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td><td style="padding: 8px; text-align: center;"><button class="delete-btn" data-index="14" style="display: none; background-color: #c75050; color: white; border: none; border-radius: 3px; padding: 4px 8px; font-size: 12px; cursor: pointer;">Delete</button></td></tr>
         </tbody>
       </table>
     </div>
@@ -495,7 +496,73 @@
     <div class="clock" id="clock">3:00</div>
     <button class="restart-btn" id="restart-btn">Back</button>
     <div class="counter" id="counter">0 / 0</div>
-    <script>
+    <script type="module">
+// Firebase configuration
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getDatabase, ref, set, get, remove, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyBFOaBwJhAl4IhXZF-XqodH_YHiN2rVjiE",
+  authDomain: "trig-drill-gen-6fxns.firebaseapp.com",
+  databaseURL: "https://trig-drill-gen-6fxns-default-rtdb.firebaseio.com",
+  projectId: "trig-drill-gen-6fxns",
+  storageBucket: "trig-drill-gen-6fxns.firebasestorage.app",
+  messagingSenderId: "175456183276",
+  appId: "1:175456183276:web:6b84030991c967563a56c9",
+  measurementId: "G-HPBG8N4NWF"
+};
+
+// Initialize Firebase
+let app, database;
+let useFirebase = false;
+
+try {
+  app = initializeApp(firebaseConfig);
+  database = getDatabase(app);
+  useFirebase = true;
+} catch (error) {
+  console.warn('Firebase not configured, using fallback storage');
+}
+
+// Storage abstraction layer
+const storage = {
+  async get(key) {
+    if (useFirebase) {
+      const dbRef = ref(database, 'leaderboard');
+      const snapshot = await get(dbRef);
+      if (snapshot.exists()) {
+        return { value: JSON.stringify(snapshot.val()) };
+      }
+      return null;
+    } else if (window.storage) {
+      return await window.storage.get(key, true);
+    } else {
+      const data = localStorage.getItem(key);
+      return data ? { value: data } : null;
+    }
+  },
+  
+  async set(key, value) {
+    if (useFirebase) {
+      const dbRef = ref(database, 'leaderboard');
+      const data = JSON.parse(value);
+      await set(dbRef, data);
+    } else if (window.storage) {
+      await window.storage.set(key, value, true);
+    } else {
+      localStorage.setItem(key, value);
+    }
+  },
+  
+  async delete(index) {
+    if (useFirebase) {
+      const dbRef = ref(database, `leaderboard/${index}`);
+      await remove(dbRef);
+    }
+  }
+};
+
 // Move formatRadian to global scope
 function formatRadian(deg) {
   const map = {
@@ -1000,7 +1067,32 @@ document.getElementById('restart-btn').addEventListener('click', e => {
   }
 });
 
+let isDevMode = false;
+let devClickCount = 0;
+let devClickTimer = null;
+
 document.getElementById('leaderboard-btn').addEventListener('click', e => {
+  // Secret dev mode: click 5 times within 2 seconds
+  devClickCount++;
+  
+  if (devClickCount === 5) {
+    isDevMode = !isDevMode;
+    alert(isDevMode ? 'Dev mode enabled' : 'Dev mode disabled');
+    devClickCount = 0;
+    clearTimeout(devClickTimer);
+    loadLeaderboard(); // Refresh display to show/hide delete buttons
+  }
+  
+  if (devClickTimer) clearTimeout(devClickTimer);
+  devClickTimer = setTimeout(() => {
+    devClickCount = 0;
+  }, 2000);
+  
+  document.body.classList.remove('show-intro-modal');
+  document.body.classList.add('show-leaderboard');
+  document.querySelector('.leaderboard-screen').style.display = 'block';
+  document.querySelector('.not-score').style.display = 'none';
+});
   document.body.classList.remove('show-intro-modal');
   document.body.classList.add('show-leaderboard');
   document.querySelector('.leaderboard-screen').style.display = 'block';
@@ -1022,6 +1114,89 @@ document.getElementById('initials-field').addEventListener('keydown', async e =>
   if (e.key === 'Enter') {
     const initials = e.target.value.trim().toUpperCase();
     if (initials.length !== 2) {
+      e.target.style.borderColor = '#c75050';
+      e.target.style.backgroundColor = '#ffcccc';
+      return;
+    }
+    
+    // Check for blocked initials
+    if (initials === 'FU') {
+      alert('nice try lol');
+      e.target.style.borderColor = '#c75050';
+      e.target.style.backgroundColor = '#ffcccc';
+      e.target.value = '';
+      setTimeout(() => {
+        e.target.style.borderColor = '#2092e3';
+        e.target.style.backgroundColor = 'white';
+      }, 2000);
+      return;
+    }
+    
+    const finalScoreText = document.getElementById('final-score').textContent;
+    
+    try {
+      // Get existing leaderboard
+      let leaderboard = [];
+      try {
+        const leaderboardData = await storage.get('leaderboard');
+        leaderboard = leaderboardData ? JSON.parse(leaderboardData.value) : [];
+      } catch (getError) {
+        leaderboard = [];
+      }
+      
+      // Add new score
+      leaderboard.push({ initials, score: finalScoreText });
+      
+      // Sort by time (convert MM:SS.S to milliseconds for comparison)
+      leaderboard.sort((a, b) => {
+        const timeToMs = (timeStr) => {
+          const parts = timeStr.split(':');
+          const minutes = parseInt(parts[0]);
+          const seconds = parseFloat(parts[1]);
+          return minutes * 60000 + seconds * 1000;
+        };
+        return timeToMs(a.score) - timeToMs(b.score);
+      });
+      
+      // Keep only top 15
+      leaderboard = leaderboard.slice(0, 15);
+      
+      // Save to storage
+      await storage.set('leaderboard', JSON.stringify(leaderboard));
+      
+      // Update leaderboard display
+      updateLeaderboardDisplay(leaderboard);
+      
+      // Success - turn green
+      e.target.style.borderColor = '#5a9e5a';
+      e.target.style.backgroundColor = '#ccffcc';
+      
+      // After 1 second, go back to menu
+      setTimeout(() => {
+        document.body.classList.remove('show-score');
+        document.body.classList.add('show-intro-modal');
+        document.querySelector('.not-score').style.display = 'block';
+        document.getElementById('initials-input').style.display = 'none';
+        document.getElementById('leaderboard-submit').style.display = 'none';
+        e.target.style.borderColor = '#2092e3';
+        e.target.style.backgroundColor = 'white';
+        e.target.value = '';
+      }, 1000);
+      
+    } catch (error) {
+      // Error - turn red
+      e.target.style.borderColor = '#c75050';
+      e.target.style.backgroundColor = '#ffcccc';
+      console.error('Error submitting score:', error);
+      
+      // Reset after 2 seconds
+      setTimeout(() => {
+        e.target.style.borderColor = '#2092e3';
+        e.target.style.backgroundColor = 'white';
+      }, 2000);
+    }
+  }
+});.length !== 2) {
       e.target.style.borderColor = '#c75050';
       e.target.style.backgroundColor = '#ffcccc';
       return;
@@ -1116,20 +1291,77 @@ function updateLeaderboardDisplay(leaderboard) {
   
   for (let i = 0; i < 15; i++) {
     const cells = rows[i].getElementsByTagName('td');
+    const deleteBtn = cells[3].querySelector('.delete-btn');
+    
     if (leaderboard[i]) {
       cells[1].textContent = leaderboard[i].initials;
       cells[2].textContent = leaderboard[i].score;
+      if (isDevMode) {
+        deleteBtn.style.display = 'inline-block';
+      }
     } else {
       cells[1].textContent = '--';
       cells[2].textContent = '--:--.-';
+      deleteBtn.style.display = 'none';
     }
   }
 }
 
+let isDevMode = false;
+let devClickCount = 0;
+let devClickTimer = null;
+
+// Secret dev mode: click "Leaderboard" 5 times within 2 seconds
+document.getElementById('leaderboard-btn').addEventListener('click', e => {
+  devClickCount++;
+  
+  if (devClickCount === 5) {
+    isDevMode = !isDevMode;
+    alert(isDevMode ? 'Dev mode enabled' : 'Dev mode disabled');
+    devClickCount = 0;
+    clearTimeout(devClickTimer);
+    loadLeaderboard(); // Refresh display
+    return;
+  }
+  
+  if (devClickTimer) clearTimeout(devClickTimer);
+  devClickTimer = setTimeout(() => {
+    devClickCount = 0;
+  }, 2000);
+  
+  document.body.classList.remove('show-intro-modal');
+  document.body.classList.add('show-leaderboard');
+  document.querySelector('.leaderboard-screen').style.display = 'block';
+  document.querySelector('.not-score').style.display = 'none';
+});
+
+// Handle delete button clicks
+document.getElementById('leaderboard-body').addEventListener('click', async e => {
+  if (e.target.classList.contains('delete-btn') && isDevMode) {
+    const index = parseInt(e.target.dataset.index);
+    
+    try {
+      const leaderboardData = await storage.get('leaderboard');
+      let leaderboard = leaderboardData ? JSON.parse(leaderboardData.value) : [];
+      
+      // Remove the entry
+      leaderboard.splice(index, 1);
+      
+      // Save updated leaderboard
+      await storage.set('leaderboard', JSON.stringify(leaderboard));
+      
+      // Update display
+      updateLeaderboardDisplay(leaderboard);
+    } catch (error) {
+      alert('Error deleting entry');
+    }
+  }
+});
+
 // Load leaderboard on page load
 async function loadLeaderboard() {
   try {
-    const leaderboardData = await window.storage.get('leaderboard', true);
+    const leaderboardData = await storage.get('leaderboard');
     if (leaderboardData) {
       const leaderboard = JSON.parse(leaderboardData.value);
       updateLeaderboardDisplay(leaderboard);
@@ -1140,6 +1372,20 @@ async function loadLeaderboard() {
 }
 
 loadLeaderboard();
+
+// If using Firebase, listen for real-time updates
+if (useFirebase) {
+  const dbRef = ref(database, 'leaderboard');
+  onValue(dbRef, (snapshot) => {
+    if (snapshot.exists()) {
+      const leaderboard = snapshot.val();
+      updateLeaderboardDisplay(leaderboard);
+    }
+  });
+}
+    </script>
+  </body>
+</html>
     </script>
   </body>
 </html>
