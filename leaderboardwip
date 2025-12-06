@@ -65,16 +65,16 @@
         display: flex;
       }
       .show-score .score {
-        display: block;
+        display: flex;
       }
       .show-intro-modal .not-score {
-        display: block;
+        display: flex;
       }
       .show-score .not-score {
         display: none;
       }
       .show-leaderboard .leaderboard-modal {
-        display: block;
+        display: flex;
       }
       .show-leaderboard .not-leaderboard {
         display: none;
@@ -377,12 +377,14 @@
     <div class="clock" id="clock">3:00</div>
     <div class="counter" id="counter">0 / 0</div>
     <script>
+// Move formatRadian to global scope
 function formatRadian(deg) {
   const map = {
     0: [0,1], 30: [1,6], 45: [1,4], 60: [1,3],
     90: [1,2], 120: [2,3], 135: [3,4], 150: [5,6],
     180: [1,1], 210: [7,6], 225: [5,4], 240: [4,3],
     270: [3,2], 300: [5,3], 315: [7,4], 330: [11,6], 360: [2,1],
+    // Add coterminal angles
     390: [13,6], 420: [7,3], 450: [5,2], 480: [8,3],
     510: [17,6], 540: [3,1], 570: [19,6], 600: [10,3],
     630: [7,2], 660: [11,3], 690: [23,6], 720: [4,1],
@@ -392,11 +394,14 @@ function formatRadian(deg) {
     '-270': [-3,2], '-300': [-5,3], '-315': [-7,4], '-330': [-11,6], '-360': [-2,1]
   };
   
+  // Normalize to get the key
   const normalizedDeg = deg % 360;
   const key = Math.abs(deg - Math.round(deg)) < 0.01 ? Math.round(deg).toString() : deg.toString();
   
   const f = map[key] || map[normalizedDeg];
   if (!f) {
+    // Convert any angle to fraction of π
+    // Find GCD to simplify the fraction
     function gcd(a, b) {
       a = Math.abs(a);
       b = Math.abs(b);
@@ -408,6 +413,7 @@ function formatRadian(deg) {
       return a;
     }
     
+    // deg/180 = num/denom (in terms of π)
     let num = Math.round(deg);
     let denom = 180;
     const divisor = gcd(num, denom);
@@ -473,6 +479,7 @@ function generateDrill({
     let result = mapping[value];
     if (result) return result;
     
+    // Numeric fallback
     if (typeof value === 'number' && value !== 0) {
       return (1 / value).toString();
     }
@@ -716,6 +723,7 @@ solutions.addEventListener('mousedown', e => {
   if (solution) {
     e.preventDefault();
     
+    // Check if NEG button was clicked
     if (solution.id === 'neg-btn') {
       negativeMode = !negativeMode;
       solution.classList.toggle('active', negativeMode);
@@ -725,10 +733,12 @@ solutions.addEventListener('mousedown', e => {
     const isRightClick = e.button === 2;
     let answer = solution.dataset.answer;
     
+    // Make negative if right-click or negativeMode (but not for 0 or und)
     if ((isRightClick || negativeMode) && answer !== '0' && answer !== 'und') {
       answer = answer.startsWith('-') ? answer.slice(1) : '-' + answer;
     }
     
+    // Reset negative mode after any answer submission
     if (negativeMode) {
       negativeMode = false;
       document.getElementById('neg-btn').classList.remove('active');
@@ -738,6 +748,7 @@ solutions.addEventListener('mousedown', e => {
   }
 });
 
+// Prevent context menu on solution buttons
 solutions.addEventListener('contextmenu', e => {
   if (e.target.closest('.solution')) {
     e.preventDefault();
@@ -775,13 +786,16 @@ document.getElementById('menu').addEventListener('click', e => {
 });
 
 document.getElementById('leaderboard-btn').addEventListener('click', e => {
+  document.body.classList.add('show-intro-modal');
   document.body.classList.add('show-leaderboard');
 });
 
 document.getElementById('back').addEventListener('click', e => {
   document.body.classList.remove('show-leaderboard');
-  document.body.classList.remove('show-score');
 });
+    </script>
+  </body>
+</html>
     </script>
   </body>
 </html>
