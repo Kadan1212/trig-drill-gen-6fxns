@@ -895,9 +895,9 @@ function submitAnswer(answer) {
     playing = false;
     window.cancelAnimationFrame(clockStopper);
     const time = Date.now() - startTime;
-    score.innerHTML = `It took you <strong>${formatTime(time)}</strong> to get <strong>${rights}</strong> out of ${problems.length} correct.<br>That means it'll take you ${formatTime(Math.round(time / problems.length * 10))} to do 10 problems.`;
+    score.innerHTML = `It took you <strong>${formatTime(time)}</strong> to get <strong>${rights}</strong> out of ${problems.length} correct.<br>That means it'll take you ${formatTime(Math.round(time / problems.length * 9))} to do 9 problems.`;
     
-    const meetsRequirements = checkboxes.limit20.checked && 
+    const meetsRequirements = checkboxes.limit20.checked &&
                              checkboxes.useDegrees.checked && 
                              checkboxes.radians.checked && 
                              checkboxes.deg90s.checked && 
