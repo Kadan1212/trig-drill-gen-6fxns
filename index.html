@@ -496,11 +496,9 @@
     <div class="clock" id="clock">3:00</div>
     <button class="restart-btn" id="restart-btn">Back</button>
     <div class="counter" id="counter">0 / 0</div>
-    <script type="module">
-// Firebase configuration
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getDatabase, ref, set, get, remove, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script>
 // Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyBFOaBwJhAl4IhXZF-XqodH_YHiN2rVjiE",
@@ -514,12 +512,12 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-let app, database;
+let database;
 let useFirebase = false;
 
 try {
-  app = initializeApp(firebaseConfig);
-  database = getDatabase(app);
+  firebase.initializeApp(firebaseConfig);
+  database = firebase.database();
   useFirebase = true;
 } catch (error) {
   console.warn('Firebase not configured, using fallback storage');
@@ -529,8 +527,7 @@ try {
 const storage = {
   async get(key) {
     if (useFirebase) {
-      const dbRef = ref(database, 'leaderboard');
-      const snapshot = await get(dbRef);
+      const snapshot = await database.ref('leaderboard').once('value');
       if (snapshot.exists()) {
         return { value: JSON.stringify(snapshot.val()) };
       }
@@ -545,9 +542,8 @@ const storage = {
   
   async set(key, value) {
     if (useFirebase) {
-      const dbRef = ref(database, 'leaderboard');
       const data = JSON.parse(value);
-      await set(dbRef, data);
+      await database.ref('leaderboard').set(data);
     } else if (window.storage) {
       await window.storage.set(key, value, true);
     } else {
@@ -557,8 +553,7 @@ const storage = {
   
   async delete(index) {
     if (useFirebase) {
-      const dbRef = ref(database, `leaderboard/${index}`);
-      await remove(dbRef);
+      await database.ref(`leaderboard/${index}`).remove();
     }
   }
 };
@@ -1375,17 +1370,13 @@ loadLeaderboard();
 
 // If using Firebase, listen for real-time updates
 if (useFirebase) {
-  const dbRef = ref(database, 'leaderboard');
-  onValue(dbRef, (snapshot) => {
+  database.ref('leaderboard').on('value', (snapshot) => {
     if (snapshot.exists()) {
       const leaderboard = snapshot.val();
       updateLeaderboardDisplay(leaderboard);
     }
   });
 }
-    </script>
-  </body>
-</html>
     </script>
   </body>
 </html>
