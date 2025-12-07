@@ -631,7 +631,7 @@ function generateDrill(options = {}) {
     anglesToAdd.forEach(deg => {
       const [sin, cos, tan] = getAnswers(deg);
       const tanVal = (cos === 0 || tan === 'und') ? 'und' : tan;
-      const cotVal = (sin === 0 || tanVal === 'und') ? 'und' : reciprocal(tanVal);
+      const cotVal = (sin === 0) ? 'und' : (tanVal === 'und') ? '0' : reciprocal(tanVal);
       const secVal = (cos === 0) ? 'und' : reciprocal(cos);
       const cscVal = (sin === 0) ? 'und' : reciprocal(sin);
 
