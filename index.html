@@ -409,7 +409,7 @@
     </div>
     <div class="intro-modal leaderboard-screen" style="display: none;">
       <h1 style="text-align: center;">Leaderboard</h1>
-      <p style="font-size: 16px; margin-top: 20px;">To submit a score, check: <strong>limit to 20 problems, degrees + radians, all angles + coterminal, all 6 trig functions (sin/cos, tan/cot, sec/csc), & uncheck quad I angles.</strong> Other options don't matter.</p>
+      <p style="font-size: 16px; margin-top: 20px;">To submit a score, check: <strong>limit to 20 problems, degrees + radians, all angles + coterminal, all trig functions, & uncheck limit to quad I angles.</strong> Other options don't matter.</p>
       <p style="font-size: 16px; margin-top: 15px; white-space: nowrap;">The score is calculated as following: MM:SS.S + (wrong answers*15sec) + 2 sec if unrationalizing is checked (which makes it harder to do subsequent operations).</p>
       <table style="width: 100%; margin-top: 30px; border-collapse: collapse; font-size: 18px;">
         <thead>
@@ -433,6 +433,7 @@
           <tr><td style="padding: 8px; text-align: center;">10</td><td style="padding: 8px;">--</td><td style="padding: 8px; padding-left: 20px;">--:--.-</td><td style="padding: 8px; text-align: center;"><button class="delete-btn" data-index="9" style="display: none; background-color: #c75050; color: white; border: none; border-radius: 3px; padding: 4px 8px; font-size: 12px; cursor: pointer;">Delete</button></td></tr>
         </tbody>
       </table>
+      <button id="page-toggle-btn" style="position: absolute; bottom: 20px; right: 20px; background-color: #2092e3; color: white; border: none; border-radius: 8px; padding: 10px 20px; font-size: 16px; cursor: pointer; font-weight: 600;">Next Page →</button>
     </div>
     <div class="problems" id="problems"></div>
     <div class="solutions" id="solutions">
@@ -951,6 +952,8 @@ document.getElementById('restart-btn').addEventListener('click', e => {
 let isDevMode = false;
 let devClickCount = 0;
 let devClickTimer = null;
+let currentLeaderboardPage = 1;
+let fullLeaderboardData = [];
 
 document.getElementById('leaderboard-btn').addEventListener('click', e => {
   devClickCount++;
@@ -968,10 +971,16 @@ document.getElementById('leaderboard-btn').addEventListener('click', e => {
     devClickCount = 0;
   }, 2000);
   
+  currentLeaderboardPage = 1;
   document.body.classList.remove('show-intro-modal');
   document.body.classList.add('show-leaderboard');
   document.querySelector('.leaderboard-screen').style.display = 'block';
   document.querySelector('.not-score').style.display = 'none';
+});
+
+document.getElementById('page-toggle-btn').addEventListener('click', e => {
+  currentLeaderboardPage = currentLeaderboardPage === 1 ? 2 : 1;
+  updateLeaderboardDisplay(fullLeaderboardData);
 });
 
 document.getElementById('submit-score').addEventListener('click', e => {
@@ -1028,7 +1037,7 @@ document.getElementById('initials-field').addEventListener('keypress', async e =
         return timeToMs(a.score) - timeToMs(b.score);
       });
       
-      leaderboard = leaderboard.slice(0, 15);
+      leaderboard = leaderboard.slice(0, 20);
       
       await fetch(`${FIREBASE_URL}/leaderboard.json`, {
         method: 'PUT',
@@ -1067,16 +1076,24 @@ document.getElementById('initials-field').addEventListener('keypress', async e =
 });
 
 function updateLeaderboardDisplay(leaderboard) {
+  fullLeaderboardData = leaderboard;
   const tbody = document.getElementById('leaderboard-body');
   const rows = tbody.getElementsByTagName('tr');
   
-  for (let i = 0; i < 15; i++) {
+  const startIndex = (currentLeaderboardPage - 1) * 10;
+  const endIndex = startIndex + 10;
+  
+  for (let i = 0; i < 10; i++) {
     const cells = rows[i].getElementsByTagName('td');
     const deleteBtn = cells[3].querySelector('.delete-btn');
+    const dataIndex = startIndex + i;
     
-    if (leaderboard[i]) {
-      cells[1].textContent = leaderboard[i].initials;
-      cells[2].textContent = leaderboard[i].score;
+    cells[0].textContent = (startIndex + i + 1);
+    
+    if (leaderboard[dataIndex]) {
+      cells[1].textContent = leaderboard[dataIndex].initials;
+      cells[2].textContent = leaderboard[dataIndex].score;
+      deleteBtn.dataset.index = dataIndex;
       if (isDevMode) {
         deleteBtn.style.display = 'inline-block';
       }
@@ -1085,6 +1102,14 @@ function updateLeaderboardDisplay(leaderboard) {
       cells[2].textContent = '--:--.-';
       deleteBtn.style.display = 'none';
     }
+  }
+  
+  const pageToggleBtn = document.getElementById('page-toggle-btn');
+  
+  if (currentLeaderboardPage === 1) {
+    pageToggleBtn.textContent = 'Next Page →';
+  } else {
+    pageToggleBtn.textContent = '← Previous Page';
   }
 }
 
