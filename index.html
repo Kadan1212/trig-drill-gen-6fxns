@@ -409,7 +409,7 @@
     </div>
     <div class="intro-modal leaderboard-screen" style="display: none;">
       <h1 style="text-align: center;">Leaderboard</h1>
-      <p style="font-size: 16px; margin-top: 20px;">To submit a score, check: <strong>limit to 20 problems, degrees + radians, all angles + coterminal, all trig functions, & uncheck limit to quad I angles.</strong> Other options don't matter.</p>
+      <p style="font-size: 16px; margin-top: 20px;">To submit a score, check: <strong>limit to 20 problems, degrees + radians, all angles + coterminal, all 6 trig functions (sin/cos, tan/cot, sec/csc), & uncheck quad I angles.</strong> Other options don't matter.</p>
       <p style="font-size: 16px; margin-top: 15px; white-space: nowrap;">The score is calculated as following: MM:SS.S + (wrong answers*15sec) + 2 sec if unrationalizing is checked (which makes it harder to do subsequent operations).</p>
       <table style="width: 100%; margin-top: 30px; border-collapse: collapse; font-size: 18px;">
         <thead>
@@ -721,12 +721,36 @@ const checkboxes = {
   showTime: document.getElementById('showtime'),
   limit20: document.getElementById('limit20'),
   showNeg1: document.getElementById('showneg1'),
-  unlationalized: document.getElementById('unrationalized'),
+  unrationalized: document.getElementById('unrationalized'),
   darkMode: document.getElementById('darkmode'),
   sincos: document.getElementById('sincos'),
   tancot: document.getElementById('tancot'),
   seccsc: document.getElementById('seccsc')
 };
+
+function loadPreferences() {
+  Object.keys(checkboxes).forEach(key => {
+    const saved = localStorage.getItem(`pref_${key}`);
+    if (saved !== null) {
+      checkboxes[key].checked = saved === 'true';
+    }
+  });
+  if (checkboxes.darkMode.checked) {
+    document.body.classList.add('dark-mode');
+  }
+}
+
+function savePreferences() {
+  Object.keys(checkboxes).forEach(key => {
+    localStorage.setItem(`pref_${key}`, checkboxes[key].checked);
+  });
+}
+
+loadPreferences();
+
+Object.values(checkboxes).forEach(checkbox => {
+  checkbox.addEventListener('change', savePreferences);
+});
 
 checkboxes.darkMode.addEventListener('change', () => {
   if (checkboxes.darkMode.checked) {
